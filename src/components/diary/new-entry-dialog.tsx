@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Camera, MapPin, Loader2, Sparkles, BookText, BarChart, Route, Timer, Footprints } from 'lucide-react';
 import { suggestWritingPrompts } from '@/ai/flows/suggest-writing-prompts';
@@ -19,10 +19,11 @@ import { Label } from '@/components/ui/label';
 type NewEntryDialogProps = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onSave: (entry: Omit<DiaryEntry, 'id' | 'date'>) => void;
+  onSave: (entry: Omit<DiaryEntry, 'id' | 'date'>, id?: string) => void;
+  entry: DiaryEntry | null;
 };
 
-export default function NewEntryDialog({ isOpen, onOpenChange, onSave }: NewEntryDialogProps) {
+export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: NewEntryDialogProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -52,7 +53,24 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave }: NewEntr
     setIsLocating(false);
     setIsGeneratingPrompts(false);
     setLocationError(null);
+    onOpenChange(false);
   };
+  
+  useEffect(() => {
+    if (isOpen && entry) {
+      setImagePreview(entry.photoUrl);
+      setLocation(entry.location);
+      setText(entry.text);
+      setDistance(entry.stats?.distance ? (entry.stats.distance * 1000).toString() : '');
+      setTime(entry.stats?.time?.toString() ?? '');
+      setSteps(entry.stats?.steps?.toString() ?? '');
+      setImageFile(null);
+      setPrompts([]);
+      setLocationError(null);
+    } else {
+      resetState();
+    }
+  }, [isOpen, entry]);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -90,7 +108,8 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave }: NewEntr
   };
 
   const handleGeneratePrompts = async () => {
-    if (!imageFile) {
+    const imageSource = imageFile || imagePreview;
+    if (!imageSource) {
       toast({
         title: '사진 필요',
         description: 'AI 추천을 받으려면 먼저 사진을 올려주세요.',
@@ -99,23 +118,30 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave }: NewEntr
       return;
     }
     setIsGeneratingPrompts(true);
+
     try {
-      const reader = new FileReader();
-      reader.readAsDataURL(imageFile);
-      reader.onload = async () => {
-        const photoDataUri = reader.result as string;
+        let photoDataUri: string;
+        if (imageFile) {
+            photoDataUri = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result as string);
+                reader.readAsDataURL(imageFile);
+            });
+        } else {
+            photoDataUri = imagePreview as string;
+        }
+
         const locationDescription = location ? `위도: ${location.lat.toFixed(4)}, 경도: ${location.lng.toFixed(4)}` : '어느 멋진 곳';
         const result = await suggestWritingPrompts({ photoDataUri, locationDescription });
         setPrompts(result.prompts);
-      };
     } catch (error) {
-      toast({
-        title: 'AI 추천 생성 오류',
-        description: 'AI 추천을 생성하는 중 오류가 발생했습니다.',
-        variant: 'destructive',
-      });
+        toast({
+            title: 'AI 추천 생성 오류',
+            description: 'AI 추천을 생성하는 중 오류가 발생했습니다.',
+            variant: 'destructive',
+        });
     } finally {
-      setIsGeneratingPrompts(false);
+        setIsGeneratingPrompts(false);
     }
   };
 
@@ -128,9 +154,12 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave }: NewEntr
       });
       return;
     }
+
+    const distanceInKm = distance ? parseFloat(distance) / 1000 : undefined;
+
     onSave({
       photoUrl: imagePreview,
-      imageHint: 'user uploaded',
+      imageHint: imageFile ? 'user uploaded' : entry?.imageHint || 'edited image',
       location: {
         lat: location?.lat ?? 0,
         lng: location?.lng ?? 0,
@@ -138,22 +167,23 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave }: NewEntr
       },
       text: text,
       stats: {
-        distance: distance ? parseFloat(distance) : undefined,
+        distance: distanceInKm,
         time: time ? parseInt(time, 10) : undefined,
         steps: steps ? parseInt(steps, 10) : undefined,
       }
-    });
-    resetState();
+    }, entry?.id);
+    
+    // resetState is called by onOpenChange(false)
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
         if(!open) resetState();
-        onOpenChange(open);
+        else onOpenChange(true);
     }}>
       <DialogContent className="sm:max-w-lg md:max-w-2xl max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle className="font-headline text-primary text-2xl">새로운 산책 일기</DialogTitle>
+          <DialogTitle className="font-headline text-primary text-2xl">{entry ? '산책 일기 수정' : '새로운 산책 일기'}</DialogTitle>
         </DialogHeader>
         <ScrollArea className="pr-6 -mr-6">
         <div className="grid gap-6 py-4">
@@ -172,7 +202,8 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave }: NewEntr
                   <span className="font-semibold">사진 올리기</span>
                 </button>
               )}
-              <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
+               <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
+               {entry && <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>사진 변경</Button>}
 
               <Button onClick={handleLocation} disabled={isLocating} variant="outline">
                 {isLocating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <MapPin className="mr-2 h-4 w-4" />}
@@ -194,7 +225,7 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave }: NewEntr
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="relative">
                     <Route className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="distance" type="number" placeholder="거리 (km)" value={distance} onChange={(e) => setDistance(e.target.value)} className="pl-8" />
+                    <Input id="distance" type="number" placeholder="거리 (m)" value={distance} onChange={(e) => setDistance(e.target.value)} className="pl-8" />
                   </div>
                   <div className="relative">
                     <Timer className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
