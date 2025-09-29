@@ -190,11 +190,11 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
                 <div className="grid grid-cols-2 gap-3">
                     <div className="relative">
                       <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input id="start-time" type="text" placeholder="시작 (HH:mm)" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="pl-8" />
+                      <Input id="start-time" type="time" placeholder="시작 (HH:mm)" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="pl-8" />
                     </div>
                     <div className="relative">
                        <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                       <Input id="end-time" type="text" placeholder="종료 (HH:mm)" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="pl-8" />
+                       <Input id="end-time" type="time" placeholder="종료 (HH:mm)" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="pl-8" />
                     </div>
                 </div>
 
