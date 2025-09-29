@@ -2,10 +2,11 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react';
 import Image from 'next/image';
-import { Camera, Loader2, Sparkles, BookText, BarChart, Route, Timer, Footprints, Clock } from 'lucide-react';
+import { Camera, Loader2, Sparkles, BookText, BarChart, Route, Timer, Footprints, Clock, MapPin } from 'lucide-react';
 import { suggestWritingPrompts } from '@/ai/flows/suggest-writing-prompts';
 import { useToast } from '@/hooks/use-toast';
 import type { DiaryEntry } from '@/app/lib/types';
+import { useDiary } from '@/contexts/DiaryContext';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
@@ -17,19 +18,20 @@ import { Label } from '@/components/ui/label';
 type NewEntryDialogProps = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onSave: (entry: Omit<DiaryEntry, 'id' | 'date'>, id?: string) => void;
   entry: DiaryEntry | null;
 };
 
-export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: NewEntryDialogProps) {
+export default function NewEntryDialog({ isOpen, onOpenChange, entry }: NewEntryDialogProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [text, setText] = useState('');
+  const [location, setLocation] = useState('');
   const [prompts, setPrompts] = useState<string[]>([]);
   const [distance, setDistance] = useState('');
   const [steps, setSteps] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
+  const { addEntry, updateEntry } = useDiary();
 
   const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
 
@@ -44,7 +46,6 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
         const startTotalMinutes = startH * 60 + startM;
         let endTotalMinutes = endH * 60 + endM;
         if (endTotalMinutes < startTotalMinutes) {
-          // Handle overnight case
           endTotalMinutes += 24 * 60;
         }
         return endTotalMinutes - startTotalMinutes;
@@ -58,6 +59,7 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
     setImagePreview(null);
     setImageFile(null);
     setText('');
+    setLocation('');
     setPrompts([]);
     setDistance('');
     setSteps('');
@@ -71,6 +73,7 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
       if (entry) {
         setImagePreview(entry.photoUrl);
         setText(entry.text);
+        setLocation(entry.location.description);
         setDistance(entry.stats?.distance?.toString() ?? '');
         setSteps(entry.stats?.steps?.toString() ?? '');
         setStartTime(entry.stats?.startTime ?? '');
@@ -119,7 +122,7 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
             photoDataUri = imagePreview as string;
         }
 
-        const result = await suggestWritingPrompts({ photoDataUri, locationDescription: '어느 멋진 곳' });
+        const result = await suggestWritingPrompts({ photoDataUri, locationDescription: location || '어느 멋진 곳' });
         setPrompts(result.prompts);
     } catch (error) {
         toast({
@@ -133,12 +136,21 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
   };
 
   const handleSave = () => {
+    if (!text || !imagePreview) {
+        toast({
+            title: '필수 정보 부족',
+            description: '사진과 일기 내용은 필수입니다.',
+            variant: 'destructive',
+        });
+        return;
+    }
+
     const calculatedDuration = duration;
-    onSave({
+    const entryData: Omit<DiaryEntry, 'id' | 'date'> & { id?: string, date?: Date } = {
       photoUrl: imagePreview || '',
       imageHint: imageFile ? 'user uploaded' : entry?.imageHint || 'edited image',
       location: {
-        description: '',
+        description: location || '나의 산책길',
       },
       text: text,
       stats: {
@@ -148,7 +160,15 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
         startTime: startTime || undefined,
         endTime: endTime || undefined,
       }
-    }, entry?.id);
+    };
+
+    if (entry && entry.id) {
+        updateEntry({ ...entry, ...entryData, date: entry.date });
+    } else {
+        addEntry(entryData);
+    }
+
+    handleClose(false);
   };
 
   const handleClose = (open: boolean) => {
@@ -217,8 +237,16 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
             </div>
             
             <div className="flex flex-col gap-4 h-full">
+                <div>
+                     <label htmlFor="location-text" className="flex items-center gap-2 text-sm font-medium text-foreground mb-2"><MapPin className="w-4 h-4"/>어디를 산책했나요?</label>
+                      <Input
+                          id="location-text"
+                          placeholder="예: 서울숲, 집 앞 공원"
+                          value={location}
+                          onChange={(e) => setLocation(e.target.value)}
+                      />
+                </div>
                 <div className="flex-grow flex flex-col">
-                  
                   <label htmlFor="diary-text" className="flex items-center gap-2 text-sm font-medium text-foreground mb-2"><BookText className="w-4 h-4"/>오늘의 산책은 어땠나요?</label>
                   <Textarea
                       id="diary-text"
@@ -228,7 +256,7 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
                       className="flex-grow text-base resize-none min-h-[150px]"
                   />
                 </div>
-              <Button onClick={handleGeneratePrompts} disabled={isGeneratingPrompts} className="bg-accent hover:bg-accent/90 text-accent-foreground">
+              <Button onClick={handleGeneratePrompts} disabled={isGeneratingPrompts || !imagePreview} className="bg-accent hover:bg-accent/90 text-accent-foreground">
                 {isGeneratingPrompts ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                 AI 글쓰기 추천
               </Button>

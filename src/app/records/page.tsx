@@ -1,18 +1,15 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import Link from 'next/link';
-import { initialDiaryEntries } from '@/app/lib/mock-data';
-import type { DiaryEntry } from '@/app/lib/types';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useDiary } from '@/contexts/DiaryContext';
 import DiaryCard from '@/components/diary/diary-card';
 import RecordsHeader from '@/components/layout/records-header';
 import { Button } from '@/components/ui/button';
-import { Plus, Star } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
 
 const badgeColors = [
   'bg-chart-1',
@@ -22,18 +19,9 @@ const badgeColors = [
   'bg-chart-5',
 ];
 
-const badgeTextColors = [
-  'text-chart-1-foreground',
-  'text-chart-2-foreground',
-  'text-chart-3-foreground',
-  'text-chart-4-foreground',
-  'text-chart-5-foreground',
-];
-
 export default function RecordsPage() {
-  const [entries] = useState<DiaryEntry[]>(initialDiaryEntries);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date(initialDiaryEntries[0]?.date));
-
+  const { entries } = useDiary();
+  
   const recordedDates = useMemo(() => {
     const uniqueDates = new Set(entries.map(entry => {
       const d = entry.date;
@@ -42,7 +30,9 @@ export default function RecordsPage() {
     }));
     return Array.from(uniqueDates).map(time => new Date(time)).sort((a,b) => b.getTime() - a.getTime());
   }, [entries]);
-  
+
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(recordedDates[0]);
+
   const entriesForSelectedDate = useMemo(() => {
     if (!selectedDate) return [];
     return entries.filter(entry => 
@@ -53,8 +43,6 @@ export default function RecordsPage() {
   }, [selectedDate, entries]);
 
   const handleStartQuest = () => {
-    // This would ideally use a router to navigate to a quest page
-    // For now, we just log it. A full implementation would require QuestView integration.
     console.log("Starting new quest...");
   };
 

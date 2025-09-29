@@ -11,15 +11,30 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { useDiary } from '@/contexts/DiaryContext';
 
 type ActionSelectionDialogProps = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   onEdit: () => void;
-  onDelete: () => void;
+  entryId: string | undefined;
 };
 
-export default function ActionSelectionDialog({ isOpen, onOpenChange, onEdit, onDelete }: ActionSelectionDialogProps) {
+export default function ActionSelectionDialog({ isOpen, onOpenChange, onEdit, entryId }: ActionSelectionDialogProps) {
+  const { deleteEntry } = useDiary();
+
+  const handleDelete = () => {
+    if (entryId) {
+      deleteEntry(entryId);
+    }
+    onOpenChange(false);
+  };
+
+  const handleEdit = () => {
+    onEdit();
+    onOpenChange(false);
+  }
+
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -31,8 +46,8 @@ export default function ActionSelectionDialog({ isOpen, onOpenChange, onEdit, on
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>취소</AlertDialogCancel>
-          <Button variant="outline" onClick={onEdit}>수정</Button>
-          <AlertDialogAction onClick={onDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+          <Button variant="outline" onClick={handleEdit}>수정</Button>
+          <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
             삭제
           </AlertDialogAction>
         </AlertDialogFooter>
