@@ -55,23 +55,32 @@ export default function RecordsPage() {
                 <CardDescription>배지를 선택해 그날의 일기를 보세요.</CardDescription>
               </CardHeader>
               <CardContent className="p-4 pt-0 max-h-[60vh] overflow-y-auto">
-                <div className="flex flex-wrap gap-2">
-                  {recordedDates.map(date => (
-                    <button
-                      key={date.toISOString()}
-                      onClick={() => setSelectedDate(date)}
-                      className={cn(
-                        "transition-transform transform hover:scale-105"
-                      )}
-                    >
-                      <Badge 
-                        variant={selectedDate?.getTime() === date.getTime() ? "default" : "secondary"}
-                        className="text-sm py-2 px-4 shadow"
+                <div className="flex flex-wrap gap-3">
+                  {recordedDates.map(date => {
+                    const isSelected = selectedDate?.getTime() === date.getTime();
+                    return (
+                      <button
+                        key={date.toISOString()}
+                        onClick={() => setSelectedDate(date)}
+                        className={cn(
+                          "transition-transform transform active:scale-95",
+                          isSelected ? "scale-105" : "hover:scale-105"
+                        )}
                       >
-                        {format(date, 'M월 d일', { locale: ko })}
-                      </Badge>
-                    </button>
-                  ))}
+                        <Badge 
+                           variant={isSelected ? "default" : "secondary"}
+                           className={cn(
+                             "text-sm py-2 px-5 rounded-full shadow-md border-b-4",
+                             isSelected 
+                               ? "border-primary-dark" 
+                               : "border-gray-300 dark:border-gray-600"
+                           )}
+                        >
+                          {format(date, 'M월 d일', { locale: ko })}
+                        </Badge>
+                      </button>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
