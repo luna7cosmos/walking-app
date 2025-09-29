@@ -7,6 +7,8 @@ import { suggestWritingPrompts } from '@/ai/flows/suggest-writing-prompts';
 import { useToast } from '@/hooks/use-toast';
 import type { DiaryEntry } from '@/app/lib/types';
 import { useDiary } from '@/contexts/DiaryContext';
+import { z } from 'zod';
+
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
@@ -20,6 +22,23 @@ type NewEntryDialogProps = {
   onOpenChange: (isOpen: boolean) => void;
   entry: DiaryEntry | null;
 };
+
+const diaryEntrySchema = z.object({
+  photoUrl: z.string().url().or(z.literal('')),
+  imageHint: z.string(),
+  location: z.object({
+    description: z.string().max(100),
+  }),
+  text: z.string().max(5000),
+  stats: z.object({
+    distance: z.number().int().positive().optional(),
+    time: z.number().int().positive().optional(),
+    steps: z.number().int().positive().optional(),
+    startTime: z.string().optional(),
+    endTime: z.string().optional(),
+  }),
+});
+
 
 export default function NewEntryDialog({ isOpen, onOpenChange, entry }: NewEntryDialogProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -137,7 +156,7 @@ export default function NewEntryDialog({ isOpen, onOpenChange, entry }: NewEntry
 
   const handleSave = () => {
     const calculatedDuration = duration;
-    const entryData: Omit<DiaryEntry, 'id' | 'date'> & { id?: string, date?: Date } = {
+    const entryData = {
       photoUrl: imagePreview || '',
       imageHint: imageFile ? 'user uploaded' : entry?.imageHint || 'edited image',
       location: {
@@ -153,10 +172,22 @@ export default function NewEntryDialog({ isOpen, onOpenChange, entry }: NewEntry
       }
     };
 
+    const validation = diaryEntrySchema.safeParse(entryData);
+
+    if (!validation.success) {
+      console.error(validation.error);
+      toast({
+        title: '입력 오류',
+        description: '입력 내용을 다시 확인해주세요.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     if (entry && entry.id) {
-        updateEntry({ ...entry, ...entryData, date: entry.date });
+        updateEntry({ ...entry, ...validation.data, date: entry.date });
     } else {
-        addEntry(entryData);
+        addEntry(validation.data);
     }
 
     handleClose(false);

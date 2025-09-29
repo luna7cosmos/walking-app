@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { DiaryEntry } from '@/app/lib/types';
 import { BookText, Sparkles, Save, BarChart, Route, Timer, Footprints, Clock, MapPin } from 'lucide-react';
+import { z } from 'zod';
+import { useToast } from '@/hooks/use-toast';
 
 type StepProps = {
   photoDataUri: string;
@@ -23,6 +25,22 @@ const quotes = [
   '당신의 이야기를 들려주세요. 세상이 당신의 목소리를 기다리고 있습니다.',
 ];
 
+const diaryEntrySchema = z.object({
+  photoUrl: z.string(),
+  imageHint: z.string(),
+  location: z.object({
+    description: z.string().max(100),
+  }),
+  text: z.string().max(5000),
+  stats: z.object({
+    distance: z.number().int().positive().optional(),
+    time: z.number().int().positive().optional(),
+    steps: z.number().int().positive().optional(),
+    startTime: z.string().optional(),
+    endTime: z.string().optional(),
+  }),
+});
+
 
 export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepProps) {
   const [text, setText] = useState('');
@@ -32,6 +50,7 @@ export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepP
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [quote, setQuote] = useState('');
+  const { toast } = useToast();
 
   useEffect(() => {
     setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
@@ -56,7 +75,7 @@ export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepP
 
   const handleSave = () => {
     const calculatedDuration = duration;
-    onSave({
+    const entryData = {
       photoUrl: photoDataUri,
       imageHint: 'user uploaded',
       location: { description: location || '나의 산책길' },
@@ -68,7 +87,21 @@ export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepP
         startTime: startTime || undefined,
         endTime: endTime || undefined,
       }
-    });
+    };
+
+    const validation = diaryEntrySchema.safeParse(entryData);
+
+    if (!validation.success) {
+      console.error(validation.error);
+      toast({
+        title: '입력 오류',
+        description: '입력 내용을 다시 확인해주세요.',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    onSave(validation.data);
   };
 
   return (
