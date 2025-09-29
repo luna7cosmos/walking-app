@@ -19,6 +19,7 @@ export default function QuestView({ onQuestComplete, onShowGallery }: QuestViewP
   const [currentStep, setCurrentStep] = useState(1);
   const [photoDataUri, setPhotoDataUri] = useState<string>('');
   const [prompts, setPrompts] = useState<string[]>([]);
+  const [newEntry, setNewEntry] = useState<Omit<DiaryEntry, 'id' | 'date'> | null>(null);
   
   const nextStep = () => setCurrentStep(prev => prev + 1);
 
@@ -35,7 +36,14 @@ export default function QuestView({ onQuestComplete, onShowGallery }: QuestViewP
   }
   
   const handleDiarySave = (entry: Omit<DiaryEntry, 'id' | 'date'>) => {
-    onQuestComplete(entry);
+    setNewEntry(entry);
+    nextStep();
+  }
+
+  const handleQuestFinished = () => {
+    if (newEntry) {
+      onQuestComplete(newEntry);
+    }
   }
 
   const renderStep = () => {
@@ -49,9 +57,9 @@ export default function QuestView({ onQuestComplete, onShowGallery }: QuestViewP
       case 4:
         return <Step4 onPhotoTaken={handlePhotoTaken} onSkip={handleSkipPhoto} />;
       case 5:
-        return <Step5 photoDataUri={photoDataUri} onNext={nextStep} />;
-      case 6:
         return <Step6 photoDataUri={photoDataUri} prompts={prompts} onSave={handleDiarySave} />;
+      case 6:
+        return <Step5 photoDataUri={photoDataUri} onNext={handleQuestFinished} />;
       default:
         return null;
     }

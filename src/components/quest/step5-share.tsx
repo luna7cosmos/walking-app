@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Share2 } from 'lucide-react';
+import { Share2, BookCheck } from 'lucide-react';
 
 type StepProps = {
   photoDataUri: string;
@@ -33,8 +33,8 @@ export default function Step5Share({ photoDataUri, onNext }: StepProps) {
   
   return (
     <div className="w-full max-w-md text-center animate-fade-in-up">
-      <h1 className="text-4xl font-headline font-bold text-primary mb-4">5단계: 자랑하기</h1>
-      <p className="text-lg text-muted-foreground mb-8">멋진 사진이네요! 친구들에게 자랑해보세요.</p>
+      <h1 className="text-4xl font-headline font-bold text-primary mb-4">6단계: 자랑하기</h1>
+      <p className="text-lg text-muted-foreground mb-8">멋진 사진이네요! 친구들에게 자랑하거나 퀘스트를 완료하세요.</p>
       
       {photoDataUri && (
         <div className="relative aspect-video w-full rounded-lg overflow-hidden border shadow-sm mb-8">
@@ -43,12 +43,13 @@ export default function Step5Share({ photoDataUri, onNext }: StepProps) {
       )}
 
       <div className="flex gap-4 justify-center">
-        <Button onClick={handleShare} size="lg" className="shadow-lg" variant="outline">
+        <Button onClick={handleShare} size="lg" className="shadow-lg" variant="outline" disabled={!photoDataUri}>
           <Share2 className="mr-2" />
           공유하기
         </Button>
         <Button onClick={onNext} size="lg" className="shadow-lg">
-          일기 쓰러가기
+          <BookCheck className="mr-2" />
+          퀘스트 완료
         </Button>
       </div>
     </div>

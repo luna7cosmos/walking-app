@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import type { DiaryEntry } from '@/app/lib/types';
-import { BookText, Sparkles } from 'lucide-react';
+import { BookText, Sparkles, Save } from 'lucide-react';
 
 type StepProps = {
   photoDataUri: string;
@@ -27,13 +27,17 @@ export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepP
 
   return (
     <div className="w-full max-w-lg text-center animate-fade-in-up p-4">
-      <h1 className="text-4xl font-headline font-bold text-primary mb-4">6단계: 산책일기 쓰기</h1>
-      <p className="text-lg text-muted-foreground mb-8">오늘의 산책은 어땠나요? 마지막으로 감상을 기록해주세요.</p>
+      <h1 className="text-4xl font-headline font-bold text-primary mb-4">5단계: 산책일기 쓰기</h1>
+      <p className="text-lg text-muted-foreground mb-8">오늘의 산책은 어땠나요? 이제 감상을 기록해주세요.</p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start text-left">
-        {photoDataUri && (
+        {photoDataUri ? (
           <div className="relative aspect-video w-full rounded-lg overflow-hidden border shadow-sm">
             <Image src={photoDataUri} alt="Captured from walk" fill className="object-cover" />
+          </div>
+        ) : (
+          <div className="relative aspect-video w-full rounded-lg bg-muted flex items-center justify-center">
+            <p className="text-muted-foreground">사진을 건너뛰었습니다.</p>
           </div>
         )}
         
@@ -64,7 +68,8 @@ export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepP
       </div>
       
       <Button onClick={handleSave} size="lg" className="mt-8 shadow-lg">
-        일기 저장하고 완료!
+        <Save className="mr-2" />
+        일기 저장하고 계속하기
       </Button>
     </div>
   );
