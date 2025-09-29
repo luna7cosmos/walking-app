@@ -59,7 +59,7 @@ export default function QuestView({ onQuestComplete, onShowGallery }: QuestViewP
       case 5:
         return <Step6 photoDataUri={photoDataUri} prompts={prompts} onSave={handleDiarySave} />;
       case 6:
-        return <Step5 photoDataUri={photoDataUri} onNext={handleQuestFinished} />;
+        return <Step5 onNext={handleQuestFinished} />;
       default:
         return null;
     }
