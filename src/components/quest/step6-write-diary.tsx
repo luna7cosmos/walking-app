@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { DiaryEntry } from '@/app/lib/types';
-import { BookText, Sparkles, Save, BarChart, Route, Timer, Footprints, Clock } from 'lucide-react';
+import { BookText, Sparkles, Save, BarChart, Route, Timer, Footprints, Clock, MapPin } from 'lucide-react';
 
 type StepProps = {
   photoDataUri: string;
@@ -17,6 +17,7 @@ type StepProps = {
 
 export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepProps) {
   const [text, setText] = useState('');
+  const [location, setLocation] = useState('');
   const [distance, setDistance] = useState('');
   const [steps, setSteps] = useState('');
   const [startTime, setStartTime] = useState('');
@@ -44,7 +45,7 @@ export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepP
     onSave({
       photoUrl: photoDataUri,
       imageHint: 'user uploaded',
-      location: { description: '나의 산책길' },
+      location: { description: location || '나의 산책길' },
       text: text,
       stats: {
         distance: distance ? parseInt(distance, 10) : undefined,
@@ -104,6 +105,15 @@ export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepP
         </div>
         
         <div className="flex flex-col gap-4 h-full">
+            <div>
+                 <label htmlFor="location-text" className="flex items-center gap-2 text-sm font-medium text-foreground mb-2"><MapPin className="w-4 h-4"/>어디를 산책했나요?</label>
+                  <Input
+                      id="location-text"
+                      placeholder="예: 서울숲, 집 앞 공원"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                  />
+            </div>
           <div className="flex-grow flex flex-col">
             <label htmlFor="diary-text" className="flex items-center gap-2 text-sm font-medium text-foreground mb-2"><BookText className="w-4 h-4"/>오늘의 감상</label>
             <Textarea
