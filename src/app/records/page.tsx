@@ -14,6 +14,21 @@ import { ko } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
+const badgeColors = [
+  'bg-chart-1',
+  'bg-chart-2',
+  'bg-chart-3',
+  'bg-chart-4',
+  'bg-chart-5',
+];
+
+const badgeTextColors = [
+  'text-white',
+  'text-white',
+  'text-white',
+  'text-chart-3',
+  'text-chart-3',
+];
 
 export default function RecordsPage() {
   const [entries] = useState<DiaryEntry[]>(initialDiaryEntries);
@@ -56,8 +71,10 @@ export default function RecordsPage() {
               </CardHeader>
               <CardContent className="p-4 pt-0 max-h-[60vh] overflow-y-auto">
                 <div className="flex flex-wrap gap-4 justify-center">
-                  {recordedDates.map(date => {
+                  {recordedDates.map((date, index) => {
                     const isSelected = selectedDate?.getTime() === date.getTime();
+                    const colorClass = badgeColors[index % badgeColors.length];
+                    const textColorClass = badgeTextColors[index % badgeTextColors.length];
                     return (
                       <button
                         key={date.toISOString()}
@@ -70,9 +87,11 @@ export default function RecordsPage() {
                         <div 
                            className={cn(
                              "w-20 h-20 rounded-full shadow-md border-b-4 flex flex-col items-center justify-center",
+                             colorClass,
+                             textColorClass,
                              isSelected 
-                               ? "bg-primary text-primary-foreground border-blue-800" 
-                               : "bg-secondary text-secondary-foreground border-gray-300 dark:border-gray-600"
+                               ? "border-primary-foreground/50" 
+                               : "border-transparent"
                            )}
                         >
                           <span className="font-bold text-lg">{format(date, 'M월', { locale: ko })}</span>
