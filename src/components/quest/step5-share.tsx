@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { BookCheck, Award } from 'lucide-react';
+import { BookCheck, Star } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 type StepProps = {
@@ -16,26 +15,26 @@ export default function Step5Share({ onNext }: StepProps) {
   return (
     <div className="w-full max-w-md text-center animate-fade-in-up">
       <h1 className="flex items-center justify-center gap-3 text-4xl font-headline font-bold text-primary mb-4">
-        <Award className="w-10 h-10" />
-        퀘스트 완료!
+        <Star className="w-10 h-10" />
+        참 잘했어요!
       </h1>
       <p className="text-lg text-muted-foreground mb-8">
         축하합니다! 오늘의 산책 퀘스트를 모두 완수하셨습니다.
       </p>
 
       <div className="w-2/3 mx-auto">
-        <div className="relative aspect-square w-full rounded-lg overflow-hidden border shadow-sm mb-2">
+        <div className="relative aspect-square w-full rounded-lg overflow-hidden mb-2">
           {trophyData ? (
             <Image 
               src={trophyData.imageUrl} 
-              alt="퀘스트 완료 트로피" 
+              alt="참 잘했어요 도장" 
               fill 
-              className="object-cover"
+              className="object-contain"
               data-ai-hint={trophyData.imageHint} 
             />
           ) : (
             <div className="w-full h-full bg-muted flex items-center justify-center">
-              <p className="text-muted-foreground">트로피 이미지 로딩 중...</p>
+              <p className="text-muted-foreground">도장 이미지 로딩 중...</p>
             </div>
           )}
         </div>
