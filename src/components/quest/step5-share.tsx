@@ -22,22 +22,24 @@ export default function Step5Share({ onNext }: StepProps) {
         축하합니다! 오늘의 산책 퀘스트를 모두 완수하셨습니다.
       </p>
 
-      <div className="relative aspect-video w-full rounded-lg overflow-hidden border shadow-sm mb-2">
-        {trophyImage ? (
-           <Image 
-            src={trophyImage.imageUrl} 
-            alt="퀘스트 완료 트로피" 
-            fill 
-            className="object-cover"
-            data-ai-hint={trophyImage.imageHint} 
-           />
-        ) : (
-          <div className="w-full h-full bg-muted flex items-center justify-center">
-             <p className="text-muted-foreground">트로피 이미지 로딩 중...</p>
-          </div>
-        )}
+      <div className="w-2/3 mx-auto">
+        <div className="relative aspect-square w-full rounded-lg overflow-hidden border shadow-sm mb-2">
+          {trophyImage ? (
+            <Image 
+              src={trophyImage.imageUrl} 
+              alt="퀘스트 완료 트로피" 
+              fill 
+              className="object-cover"
+              data-ai-hint={trophyImage.imageHint} 
+            />
+          ) : (
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <p className="text-muted-foreground">트로피 이미지 로딩 중...</p>
+            </div>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground mb-8">출처: Gemini</p>
       </div>
-      <p className="text-xs text-muted-foreground mb-8">출처: Gemini</p>
 
       <div className="flex gap-4 justify-center">
         <Button onClick={onNext} size="lg" className="shadow-lg">
