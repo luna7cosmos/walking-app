@@ -22,7 +22,7 @@ export default function Step5Share({ onNext }: StepProps) {
         축하합니다! 오늘의 산책 퀘스트를 모두 완수하셨습니다.
       </p>
 
-      <div className="relative aspect-video w-full rounded-lg overflow-hidden border shadow-sm mb-8">
+      <div className="relative aspect-video w-full rounded-lg overflow-hidden border shadow-sm mb-2">
         {trophyImage ? (
            <Image 
             src={trophyImage.imageUrl} 
@@ -37,6 +37,7 @@ export default function Step5Share({ onNext }: StepProps) {
           </div>
         )}
       </div>
+      <p className="text-xs text-muted-foreground mb-8">출처: Gemini</p>
 
       <div className="flex gap-4 justify-center">
         <Button onClick={onNext} size="lg" className="shadow-lg">
