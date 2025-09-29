@@ -69,14 +69,14 @@ export default function RecordsPage() {
                       >
                         <div 
                            className={cn(
-                             "w-20 h-20 text-xs rounded-full shadow-md border-b-4 flex flex-col items-center justify-center",
+                             "w-20 h-20 rounded-full shadow-md border-b-4 flex flex-col items-center justify-center",
                              isSelected 
                                ? "bg-primary text-primary-foreground border-blue-800" 
                                : "bg-secondary text-secondary-foreground border-gray-300 dark:border-gray-600"
                            )}
                         >
-                          <span className="font-bold">{format(date, 'M월', { locale: ko })}</span>
-                          <span className="text-2xl font-bold font-headline">{format(date, 'd', { locale: ko })}</span>
+                          <span className="font-bold text-lg">{format(date, 'M월', { locale: ko })}</span>
+                          <span className="font-bold font-headline text-lg">{format(date, 'd', { locale: ko })}</span>
                         </div>
                       </button>
                     );
