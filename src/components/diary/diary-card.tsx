@@ -46,7 +46,7 @@ export default function DiaryCard({ entry, index }: DiaryCardProps) {
               {entry.stats?.distance != null && (
                 <div className="flex items-center gap-1.5" title="거리">
                   <Route className="w-4 h-4" />
-                  <span>{entry.stats.distance}km</span>
+                  <span>{entry.stats.distance.toLocaleString()}m</span>
                 </div>
               )}
               {entry.stats?.time != null && (

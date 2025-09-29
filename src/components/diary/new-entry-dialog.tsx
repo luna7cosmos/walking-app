@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { Camera, MapPin, Loader2, Sparkles, BookText, BarChart, Route, Timer, Footprints } from 'lucide-react';
+import { Camera, Loader2, Sparkles, BookText, BarChart, Route, Timer, Footprints } from 'lucide-react';
 import { suggestWritingPrompts } from '@/ai/flows/suggest-writing-prompts';
 import { useToast } from '@/hooks/use-toast';
 import type { DiaryEntry } from '@/app/lib/types';
@@ -11,8 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -26,47 +24,41 @@ type NewEntryDialogProps = {
 export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: NewEntryDialogProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationDescription, setLocationDescription] = useState('');
   const [text, setText] = useState('');
   const [prompts, setPrompts] = useState<string[]>([]);
   const [distance, setDistance] = useState('');
   const [time, setTime] = useState('');
   const [steps, setSteps] = useState('');
 
-  const [isLocating, setIsLocating] = useState(false);
   const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
-  const [locationError, setLocationError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-  const mapPlaceholder = PlaceHolderImages.find(p => p.id === 'map-placeholder');
 
   const resetState = () => {
     setImagePreview(null);
     setImageFile(null);
-    setLocation(null);
+    setLocationDescription('');
     setText('');
     setPrompts([]);
     setDistance('');
     setTime('');
     setSteps('');
-    setIsLocating(false);
     setIsGeneratingPrompts(false);
-    setLocationError(null);
   };
   
   useEffect(() => {
     if (isOpen) {
       if (entry) {
         setImagePreview(entry.photoUrl);
-        setLocation(entry.location);
+        setLocationDescription(entry.location.description);
         setText(entry.text);
-        setDistance(entry.stats?.distance ? (entry.stats.distance * 1000).toString() : '');
+        setDistance(entry.stats?.distance?.toString() ?? '');
         setTime(entry.stats?.time?.toString() ?? '');
         setSteps(entry.stats?.steps?.toString() ?? '');
         setImageFile(null);
         setPrompts([]);
-        setLocationError(null);
       } else {
         resetState();
       }
@@ -83,29 +75,6 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const handleLocation = () => {
-    setIsLocating(true);
-    setLocationError(null);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLocation({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-        setIsLocating(false);
-      },
-      (error) => {
-        setLocationError('위치 정보를 가져올 수 없습니다. 권한을 확인해주세요.');
-        toast({
-          title: '오류',
-          description: '위치 정보를 가져올 수 없습니다. 권한을 확인해주세요.',
-          variant: 'destructive',
-        });
-        setIsLocating(false);
-      }
-    );
   };
 
   const handleGeneratePrompts = async () => {
@@ -132,8 +101,7 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
             photoDataUri = imagePreview as string;
         }
 
-        const locationDescription = location ? `위도: ${location.lat.toFixed(4)}, 경도: ${location.lng.toFixed(4)}` : '어느 멋진 곳';
-        const result = await suggestWritingPrompts({ photoDataUri, locationDescription });
+        const result = await suggestWritingPrompts({ photoDataUri, locationDescription: locationDescription || '어느 멋진 곳' });
         setPrompts(result.prompts);
     } catch (error) {
         toast({
@@ -147,28 +115,24 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
   };
 
   const handleSave = () => {
-    if (!imagePreview || !text) {
+    if (!imagePreview || !text || !locationDescription) {
       toast({
         title: '필수 항목 누락',
-        description: '사진과 일기 내용은 필수입니다.',
+        description: '장소, 사진, 일기 내용은 필수입니다.',
         variant: 'destructive',
       });
       return;
     }
 
-    const distanceInKm = distance ? parseFloat(distance) / 1000 : undefined;
-
     onSave({
       photoUrl: imagePreview,
       imageHint: imageFile ? 'user uploaded' : entry?.imageHint || 'edited image',
       location: {
-        lat: location?.lat ?? 0,
-        lng: location?.lng ?? 0,
-        description: location ? `위도: ${location.lat.toFixed(4)}, 경도: ${location.lng.toFixed(4)}` : '알 수 없는 장소',
+        description: locationDescription,
       },
       text: text,
       stats: {
-        distance: distanceInKm,
+        distance: distance ? parseInt(distance, 10) : undefined,
         time: time ? parseInt(time, 10) : undefined,
         steps: steps ? parseInt(steps, 10) : undefined,
       }
@@ -209,21 +173,6 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
                <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
                {imagePreview && <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>사진 변경</Button>}
 
-              <Button onClick={handleLocation} disabled={isLocating} variant="outline">
-                {isLocating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <MapPin className="mr-2 h-4 w-4" />}
-                {location ? '위치 재설정' : '현재 위치 가져오기'}
-              </Button>
-              {location && (
-                <div className="relative aspect-video w-full rounded-lg overflow-hidden border shadow-sm">
-                  <Image src={mapPlaceholder?.imageUrl || ''} data-ai-hint={mapPlaceholder?.imageHint || 'map aerial'} alt="Map" fill className="object-cover opacity-80" />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/10">
-                    <MapPin className="h-8 w-8 text-destructive animate-pulse" />
-                  </div>
-                  <Badge variant="secondary" className="absolute bottom-2 right-2">{`위도: ${location.lat.toFixed(2)}, 경도: ${location.lng.toFixed(2)}`}</Badge>
-                </div>
-              )}
-               {locationError && <p className="text-sm text-destructive">{locationError}</p>}
-
               <div className="space-y-3 pt-2">
                 <Label className="flex items-center gap-2 text-sm font-medium"><BarChart className="w-4 h-4 text-muted-foreground"/>산책 기록 (선택)</Label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -246,14 +195,23 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
             
             <div className="flex flex-col gap-4 h-full">
                 <div className="flex-grow flex flex-col">
-                    <label htmlFor="diary-text" className="flex items-center gap-2 text-sm font-medium text-foreground mb-2"><BookText className="w-4 h-4"/>오늘의 산책은 어땠나요?</label>
-                    <Textarea
-                        id="diary-text"
-                        placeholder="이곳에 감상을 기록해보세요..."
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                        className="flex-grow text-base resize-none min-h-[150px]"
-                    />
+                  <div className="mb-4">
+                      <Label htmlFor="location-description" className="text-sm font-medium text-foreground mb-2">어디를 산책했나요?</Label>
+                      <Input
+                          id="location-description"
+                          placeholder="예: 서울숲, 집 앞 공원"
+                          value={locationDescription}
+                          onChange={(e) => setLocationDescription(e.target.value)}
+                      />
+                  </div>
+                  <label htmlFor="diary-text" className="flex items-center gap-2 text-sm font-medium text-foreground mb-2"><BookText className="w-4 h-4"/>오늘의 산책은 어땠나요?</label>
+                  <Textarea
+                      id="diary-text"
+                      placeholder="이곳에 감상을 기록해보세요..."
+                      value={text}
+                      onChange={(e) => setText(e.target.value)}
+                      className="flex-grow text-base resize-none min-h-[150px]"
+                  />
                 </div>
               <Button onClick={handleGeneratePrompts} disabled={isGeneratingPrompts} className="bg-accent hover:bg-accent/90 text-accent-foreground">
                 {isGeneratingPrompts ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}

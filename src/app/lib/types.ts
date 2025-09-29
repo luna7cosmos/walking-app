@@ -4,8 +4,6 @@ export interface DiaryEntry {
   imageHint: string;
   date: Date;
   location: {
-    lat: number;
-    lng: number;
     description: string;
   };
   text: string;
