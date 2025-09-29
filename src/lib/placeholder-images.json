@@ -33,8 +33,8 @@
     {
       "id": "quest-complete-trophy",
       "description": "A trophy for completing a quest",
-      "imageUrl": "https://images.unsplash.com/photo-1574881682399-523ed8357a76?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx0cm9waHl8ZW58MHx8fHwxNzU5MzE5NTY5fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "trophy award"
+      "imageUrl": "https://storage.googleapis.com/aif-stg-gcs-project-enablement/prod/project_builder/5b55b57d-4ff5-4303-a1f5-19a933f8149e/user_images/2024-07-29/6ff5a7e6-7a1a-45c1-925f-2d93e50668b5.png",
+      "imageHint": "winner trophy"
     }
   ]
 }
