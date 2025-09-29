@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import DiaryCard from '@/components/diary/diary-card';
 import RecordsHeader from '@/components/layout/records-header';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -70,13 +70,15 @@ export default function RecordsPage() {
                         <Badge 
                            variant={isSelected ? "default" : "secondary"}
                            className={cn(
-                             "text-sm py-2 px-5 rounded-full shadow-md border-b-4",
+                             "text-sm py-2 px-5 rounded-full shadow-md border-b-4 flex items-center gap-2",
                              isSelected 
                                ? "border-primary-dark" 
                                : "border-gray-300 dark:border-gray-600"
                            )}
                         >
+                          <Star className="w-4 h-4" />
                           {format(date, 'M월 d일', { locale: ko })}
+                          <Star className="w-4 h-4" />
                         </Badge>
                       </button>
                     );
