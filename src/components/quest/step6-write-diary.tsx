@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,6 +15,15 @@ type StepProps = {
   onSave: (newEntry: Omit<DiaryEntry, 'id' | 'date'>) => void;
 };
 
+const quotes = [
+  '당신의 경험을 기록하세요. 당신의 생각을 기록하세요. 당신의 목소리가 중요합니다.',
+  '일기는 당신 자신과 나눌 수 있는 가장 사적인 대화입니다.',
+  '쓰기는 인간의 형태를 한 생각입니다.',
+  '빈 페이지는 가능성으로 가득 차 있습니다.',
+  '당신의 이야기를 들려주세요. 세상이 당신의 목소리를 기다리고 있습니다.',
+];
+
+
 export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepProps) {
   const [text, setText] = useState('');
   const [location, setLocation] = useState('');
@@ -22,6 +31,11 @@ export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepP
   const [steps, setSteps] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
+  const [quote, setQuote] = useState('');
+
+  useEffect(() => {
+    setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
+  }, []);
   
   const duration = useMemo(() => {
     if (startTime && endTime) {
@@ -60,7 +74,9 @@ export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepP
   return (
     <div className="w-full max-w-4xl text-center animate-fade-in-up p-4">
       <h1 className="text-4xl font-headline font-bold text-primary mb-4">5단계: 산책일기 쓰기</h1>
-      <p className="text-lg text-muted-foreground mb-8">거의 다 왔어요! 오늘의 산책은 어땠나요? 이제 감상을 기록해주세요.</p>
+      <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+        {quote || '거의 다 왔어요! 오늘의 산책은 어땠나요? 이제 감상을 기록해주세요.'}
+      </p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start text-left">
         <div className="flex flex-col gap-4">

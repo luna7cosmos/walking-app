@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Upload, Loader2, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,11 +12,24 @@ type StepProps = {
   onSkip: () => void;
 };
 
+const quotes = [
+  '사진은 시간을 멈추게 하는 유일한 방법입니다.',
+  '순간을 포착하고, 영원히 간직하세요.',
+  '모든 사진에는 이야기가 담겨 있습니다.',
+  '오늘은 내 남은 인생의 첫날이다.',
+  '인생은 카메라와 같아요. 좋은 것을 담으려면 초점을 맞춰야 해요.',
+];
+
 export default function Step4TakePhoto({ onPhotoTaken, onSkip }: StepProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const [quote, setQuote] = useState('');
+
+  useEffect(() => {
+    setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
+  }, []);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -58,7 +71,9 @@ export default function Step4TakePhoto({ onPhotoTaken, onSkip }: StepProps) {
   return (
     <div className="w-full max-w-md text-center animate-fade-in-up">
       <h1 className="text-4xl font-headline font-bold text-primary mb-4">4단계: 산책 사진 선택</h1>
-      <p className="text-lg text-muted-foreground mb-8">벌써 산책을 즐기고 계시는군요! 이번 산책을 가장 잘 나타내는 사진을 선택해주세요.</p>
+      <p className="text-lg text-muted-foreground mb-8 max-w-lg">
+        {quote || '벌써 산책을 즐기고 계시는군요! 이번 산책을 가장 잘 나타내는 사진을 선택해주세요.'}
+      </p>
       
       <div className="aspect-video w-full rounded-lg border-2 border-dashed border-muted-foreground/50 flex flex-col items-center justify-center text-muted-foreground bg-muted/20 p-4 mb-8">
         {imagePreview ? (

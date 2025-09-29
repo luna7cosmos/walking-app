@@ -1,24 +1,51 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { BookCheck, Star, Award } from 'lucide-react';
+import { BookCheck } from 'lucide-react';
+import Image from 'next/image';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 type StepProps = {
   onNext: () => void;
 };
 
+const quotes = [
+  '잘했어, 넌 할 수 있어!',
+  '오늘도 해냈군요! 정말 자랑스러워요.',
+  '당신의 노력은 결코 헛되지 않아요. 멋진 하루였어요!',
+  '수고했어요! 오늘의 작은 성공이 내일의 큰 기쁨을 가져다줄 거예요.',
+  '참 잘했어요! 당신은 이미 충분히 빛나고 있어요.',
+];
+
+const trophyImage = PlaceHolderImages.find(p => p.id === 'quest-complete-trophy');
+
 export default function Step5Share({ onNext }: StepProps) {
+  const [quote, setQuote] = useState('');
+
+  useEffect(() => {
+    setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
+  }, []);
+
   return (
     <div className="w-full max-w-md text-center animate-fade-in-up">
       <div className="flex justify-center mb-8">
-        <Award className="w-24 h-24 text-primary" strokeWidth={1} />
+        {trophyImage && (
+          <Image 
+            src={trophyImage.imageUrl} 
+            alt="참 잘했어요" 
+            width={128} 
+            height={128}
+            className="w-32 h-32"
+            data-ai-hint={trophyImage.imageHint}
+          />
+        )}
       </div>
       <h1 className="flex items-center justify-center gap-3 text-4xl font-headline font-bold text-primary mb-4">
-        <Star className="w-10 h-10" />
-        참 잘했어요!
+        퀘스트 완료!
       </h1>
       <p className="text-lg text-muted-foreground mb-12">
-        축하합니다! 오늘의 산책 퀘스트를 모두 완수하셨습니다.
+        {quote || '축하합니다! 오늘의 산책 퀘스트를 모두 완수하셨습니다.'}
       </p>
 
       <Button onClick={onNext} size="lg" className="shadow-lg">
