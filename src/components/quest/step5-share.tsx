@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { BookCheck, Award, Upload } from 'lucide-react';
+import { BookCheck, Award } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 type StepProps = {
@@ -11,24 +11,7 @@ type StepProps = {
 };
 
 export default function Step5Share({ onNext }: StepProps) {
-  const defaultTrophyImage = PlaceHolderImages.find(p => p.id === 'quest-complete-trophy');
-  const [trophyImage, setTrophyImage] = useState(defaultTrophyImage?.imageUrl);
-  const [imageHint, setImageHint] = useState(defaultTrophyImage?.imageHint);
-  const [imageSource, setImageSource] = useState('Gemini');
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setTrophyImage(reader.result as string);
-        setImageHint('user uploaded');
-        setImageSource('사용자');
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const trophyData = PlaceHolderImages.find(p => p.id === 'quest-complete-trophy');
 
   return (
     <div className="w-full max-w-md text-center animate-fade-in-up">
@@ -42,13 +25,13 @@ export default function Step5Share({ onNext }: StepProps) {
 
       <div className="w-2/3 mx-auto">
         <div className="relative aspect-square w-full rounded-lg overflow-hidden border shadow-sm mb-2">
-          {trophyImage ? (
+          {trophyData ? (
             <Image 
-              src={trophyImage} 
+              src={trophyData.imageUrl} 
               alt="퀘스트 완료 트로피" 
               fill 
               className="object-cover"
-              data-ai-hint={imageHint} 
+              data-ai-hint={trophyData.imageHint} 
             />
           ) : (
             <div className="w-full h-full bg-muted flex items-center justify-center">
@@ -56,21 +39,13 @@ export default function Step5Share({ onNext }: StepProps) {
             </div>
           )}
         </div>
-        <p className="text-xs text-muted-foreground mb-8">출처: {imageSource}</p>
+        <p className="text-xs text-muted-foreground mb-8">출처: Gemini</p>
       </div>
 
-      <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
-
-      <div className="flex gap-4 justify-center">
-        <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-          <Upload className="mr-2"/>
-          트로피 사진 변경
-        </Button>
-        <Button onClick={onNext} size="lg" className="shadow-lg">
-          <BookCheck className="mr-2" />
-          일기 갤러리로 가기
-        </Button>
-      </div>
+      <Button onClick={onNext} size="lg" className="shadow-lg">
+        <BookCheck className="mr-2" />
+        일기 갤러리로 가기
+      </Button>
     </div>
   );
 }
