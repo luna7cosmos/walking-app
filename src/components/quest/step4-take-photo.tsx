@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Camera, Loader2 } from 'lucide-react';
+import { Camera, Loader2, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
@@ -9,9 +9,10 @@ import { suggestWritingPrompts } from '@/ai/flows/suggest-writing-prompts';
 
 type StepProps = {
   onPhotoTaken: (photoDataUri: string, prompts: string[]) => void;
+  onSkip: () => void;
 };
 
-export default function Step4TakePhoto({ onPhotoTaken }: StepProps) {
+export default function Step4TakePhoto({ onPhotoTaken, onSkip }: StepProps) {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
@@ -105,17 +106,29 @@ export default function Step4TakePhoto({ onPhotoTaken }: StepProps) {
             </Alert>
           )}
 
-          <Button onClick={handleTakePhoto} size="lg" className="mt-8 shadow-lg" disabled={hasCameraPermission !== true || isProcessing}>
-            {isProcessing ? <Loader2 className="mr-2 animate-spin" /> : <Camera className="mr-2" />}
-            {isProcessing ? '처리 중...' : '사진 찍기'}
-          </Button>
+          <div className="flex justify-center items-center gap-4 mt-8">
+            <Button onClick={handleTakePhoto} size="lg" className="shadow-lg" disabled={hasCameraPermission !== true || isProcessing}>
+              {isProcessing ? <Loader2 className="mr-2 animate-spin" /> : <Camera className="mr-2" />}
+              {isProcessing ? '처리 중...' : '사진 찍기'}
+            </Button>
+            <Button onClick={onSkip} size="lg" variant="ghost" disabled={isProcessing}>
+                <SkipForward className="mr-2"/>
+                건너뛰기
+            </Button>
+          </div>
         </>
       ) : (
         <div className="aspect-video w-full rounded-lg border-2 border-dashed border-muted-foreground/50 flex flex-col items-center justify-center text-muted-foreground bg-muted/20 p-4">
             <Camera className="h-12 w-12 mb-4 text-primary" />
             <h3 className="text-lg font-medium mb-2 text-foreground">카메라 사용하기</h3>
             <p className="text-sm text-muted-foreground mb-6">산책의 순간을 기록하려면 카메라 접근 권한이 필요합니다.</p>
-            <Button onClick={getCameraPermission}>카메라 사용</Button>
+            <div className="flex items-center gap-4">
+              <Button onClick={getCameraPermission}>카메라 사용</Button>
+              <Button onClick={onSkip} variant="outline">
+                <SkipForward className="mr-2"/>
+                건너뛰기
+              </Button>
+            </div>
         </div>
       )}
     </div>

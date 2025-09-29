@@ -27,6 +27,12 @@ export default function QuestView({ onQuestComplete, onShowGallery }: QuestViewP
     setPrompts(suggestedPrompts);
     nextStep();
   };
+
+  const handleSkipPhoto = () => {
+    setPhotoDataUri('');
+    setPrompts([]);
+    nextStep();
+  }
   
   const handleDiarySave = (entry: Omit<DiaryEntry, 'id' | 'date'>) => {
     onQuestComplete(entry);
@@ -41,7 +47,7 @@ export default function QuestView({ onQuestComplete, onShowGallery }: QuestViewP
       case 3:
         return <Step3 onNext={nextStep} />;
       case 4:
-        return <Step4 onPhotoTaken={handlePhotoTaken} />;
+        return <Step4 onPhotoTaken={handlePhotoTaken} onSkip={handleSkipPhoto} />;
       case 5:
         return <Step5 photoDataUri={photoDataUri} onNext={nextStep} />;
       case 6:
