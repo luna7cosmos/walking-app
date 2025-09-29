@@ -29,6 +29,12 @@
       "description": "Placeholder image for a map",
       "imageUrl": "https://images.unsplash.com/photo-1628863951038-6bb32a682f98?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxtYXAlMjBhZXJpYWx8ZW58MHx8fHwxNzU5MTU0MTE5fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "map aerial"
+    },
+    {
+      "id": "quest-complete-trophy",
+      "description": "A trophy for completing a quest",
+      "imageUrl": "https://images.unsplash.com/photo-1574881682399-523ed8357a76?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx0cm9waHl8ZW58MHx8fHwxNzU5MzE5NTY5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "trophy award"
     }
   ]
 }
