@@ -42,10 +42,12 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
       const [endH, endM] = endTime.split(':').map(Number);
       if (!isNaN(startH) && !isNaN(startM) && !isNaN(endH) && !isNaN(endM) && startH >= 0 && startH < 24 && startM >= 0 && startM < 60 && endH >= 0 && endH < 24 && endM >= 0 && endM < 60) {
         const startTotalMinutes = startH * 60 + startM;
-        const endTotalMinutes = endH * 60 + endM;
-        if (endTotalMinutes >= startTotalMinutes) {
-          return endTotalMinutes - startTotalMinutes;
+        let endTotalMinutes = endH * 60 + endM;
+        if (endTotalMinutes < startTotalMinutes) {
+          // Handle overnight case
+          endTotalMinutes += 24 * 60;
         }
+        return endTotalMinutes - startTotalMinutes;
       }
     }
     return null;
@@ -131,6 +133,7 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
   };
 
   const handleSave = () => {
+    const calculatedDuration = duration;
     onSave({
       photoUrl: imagePreview || '',
       imageHint: imageFile ? 'user uploaded' : entry?.imageHint || 'edited image',
@@ -140,7 +143,7 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
       text: text,
       stats: {
         distance: distance ? parseInt(distance, 10) : undefined,
-        time: duration ?? undefined,
+        time: calculatedDuration !== null ? calculatedDuration : undefined,
         steps: steps ? parseInt(steps, 10) : undefined,
         startTime: startTime || undefined,
         endTime: endTime || undefined,
