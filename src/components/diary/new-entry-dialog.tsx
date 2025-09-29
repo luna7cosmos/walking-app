@@ -136,15 +136,6 @@ export default function NewEntryDialog({ isOpen, onOpenChange, entry }: NewEntry
   };
 
   const handleSave = () => {
-    if (!text || !imagePreview) {
-        toast({
-            title: '필수 정보 부족',
-            description: '사진과 일기 내용은 필수입니다.',
-            variant: 'destructive',
-        });
-        return;
-    }
-
     const calculatedDuration = duration;
     const entryData: Omit<DiaryEntry, 'id' | 'date'> & { id?: string, date?: Date } = {
       photoUrl: imagePreview || '',
