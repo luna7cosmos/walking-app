@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import Image from 'next/image';
-import { Camera, Loader2, Sparkles, BookText, BarChart, Route, Timer, Footprints } from 'lucide-react';
+import { Camera, Loader2, Sparkles, BookText, BarChart, Route, Timer, Footprints, Clock } from 'lucide-react';
 import { suggestWritingPrompts } from '@/ai/flows/suggest-writing-prompts';
 import { useToast } from '@/hooks/use-toast';
 import type { DiaryEntry } from '@/app/lib/types';
@@ -28,13 +28,30 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
   const [text, setText] = useState('');
   const [prompts, setPrompts] = useState<string[]>([]);
   const [distance, setDistance] = useState('');
-  const [time, setTime] = useState('');
   const [steps, setSteps] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
 
   const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  
+  const duration = useMemo(() => {
+    if (startTime && endTime) {
+      const [startH, startM] = startTime.split(':').map(Number);
+      const [endH, endM] = endTime.split(':').map(Number);
+      if (!isNaN(startH) && !isNaN(startM) && !isNaN(endH) && !isNaN(endM)) {
+        const startTotalMinutes = startH * 60 + startM;
+        const endTotalMinutes = endH * 60 + endM;
+        if (endTotalMinutes >= startTotalMinutes) {
+          return endTotalMinutes - startTotalMinutes;
+        }
+      }
+    }
+    return null;
+  }, [startTime, endTime]);
+
 
   const resetState = () => {
     setImagePreview(null);
@@ -43,8 +60,9 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
     setText('');
     setPrompts([]);
     setDistance('');
-    setTime('');
     setSteps('');
+    setStartTime('');
+    setEndTime('');
     setIsGeneratingPrompts(false);
   };
   
@@ -55,8 +73,9 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
         setLocationDescription(entry.location.description);
         setText(entry.text);
         setDistance(entry.stats?.distance?.toString() ?? '');
-        setTime(entry.stats?.time?.toString() ?? '');
         setSteps(entry.stats?.steps?.toString() ?? '');
+        setStartTime(entry.stats?.startTime ?? '');
+        setEndTime(entry.stats?.endTime ?? '');
         setImageFile(null);
         setPrompts([]);
       } else {
@@ -133,8 +152,10 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
       text: text,
       stats: {
         distance: distance ? parseInt(distance, 10) : undefined,
-        time: time ? parseInt(time, 10) : undefined,
+        time: duration ?? undefined,
         steps: steps ? parseInt(steps, 10) : undefined,
+        startTime: startTime || undefined,
+        endTime: endTime || undefined,
       }
     }, entry?.id);
     onOpenChange(false);
@@ -175,14 +196,26 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
 
               <div className="space-y-3 pt-2">
                 <Label className="flex items-center gap-2 text-sm font-medium"><BarChart className="w-4 h-4 text-muted-foreground"/>산책 기록 (선택)</Label>
+                
+                <div className="grid grid-cols-2 gap-3">
+                    <div className="relative">
+                      <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input id="start-time" type="time" placeholder="시작 시간" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="pl-8" />
+                    </div>
+                    <div className="relative">
+                       <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                       <Input id="end-time" type="time" placeholder="종료 시간" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="pl-8" />
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="relative">
                     <Route className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input id="distance" type="number" placeholder="거리 (m)" value={distance} onChange={(e) => setDistance(e.target.value)} className="pl-8" />
                   </div>
-                  <div className="relative">
+                   <div className="relative">
                     <Timer className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="time" type="number" placeholder="시간 (분)" value={time} onChange={(e) => setTime(e.target.value)} className="pl-8" />
+                    <Input id="time" type="number" placeholder="총 시간(분)" value={duration !== null ? duration : ''} readOnly className="pl-8 bg-muted/50" />
                   </div>
                   <div className="relative">
                     <Footprints className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

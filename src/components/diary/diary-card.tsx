@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import type { DiaryEntry } from '@/app/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { MapPin, Route, Timer, Footprints } from 'lucide-react';
+import { MapPin, Route, Timer, Footprints, Clock } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 type DiaryCardProps = {
@@ -12,7 +12,7 @@ type DiaryCardProps = {
 };
 
 export default function DiaryCard({ entry, index }: DiaryCardProps) {
-  const hasStats = entry.stats && (entry.stats.distance != null || entry.stats.time != null || entry.stats.steps != null);
+  const hasStats = entry.stats && (entry.stats.distance != null || entry.stats.time != null || entry.stats.steps != null || (entry.stats.startTime && entry.stats.endTime));
 
   return (
     <Card 
@@ -43,16 +43,22 @@ export default function DiaryCard({ entry, index }: DiaryCardProps) {
           <>
             <Separator className="my-4" />
             <div className="flex flex-wrap justify-start gap-x-6 gap-y-2 items-center text-xs text-muted-foreground">
+              {entry.stats?.startTime && entry.stats?.endTime && (
+                 <div className="flex items-center gap-1.5" title="산책 시간">
+                   <Clock className="w-4 h-4" />
+                   <span>{entry.stats.startTime} - {entry.stats.endTime}</span>
+                 </div>
+              )}
+              {entry.stats?.time != null && (
+                <div className="flex items-center gap-1.5" title="총 시간">
+                  <Timer className="w-4 h-4" />
+                  <span>{entry.stats.time}분</span>
+                </div>
+              )}
               {entry.stats?.distance != null && (
                 <div className="flex items-center gap-1.5" title="거리">
                   <Route className="w-4 h-4" />
                   <span>{entry.stats.distance.toLocaleString()}m</span>
-                </div>
-              )}
-              {entry.stats?.time != null && (
-                <div className="flex items-center gap-1.5" title="시간">
-                  <Timer className="w-4 h-4" />
-                  <span>{entry.stats.time}분</span>
                 </div>
               )}
               {entry.stats?.steps != null && (

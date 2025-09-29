@@ -16,7 +16,7 @@ export const initialDiaryEntries: DiaryEntry[] = [
       description: '서울숲 공원',
     },
     text: '오랜만에 서울숲으로 산책을 나갔다. 날씨가 정말 좋아서 기분도 상쾌해졌다. 푸른 나무들 사이를 걸으니 마음이 평화로워지는 느낌이었다.',
-    stats: { distance: 3500, time: 60, steps: 4500 },
+    stats: { distance: 3500, time: 60, steps: 4500, startTime: '10:30', endTime: '11:30' },
   },
   {
     id: '2',
@@ -37,7 +37,7 @@ export const initialDiaryEntries: DiaryEntry[] = [
       description: '대학로 거리',
     },
     text: '저녁에 대학로 거리를 걸었다. 활기찬 분위기와 젊음의 에너지가 느껴졌다. 가로등 불빛 아래에서 많은 생각을 정리할 수 있는 시간이었다.',
-    stats: { distance: 2100, time: 40, steps: 2800 },
+    stats: { distance: 2100, time: 40, steps: 2800, startTime: '19:00', endTime: '19:40' },
   },
   {
     id: '4',
