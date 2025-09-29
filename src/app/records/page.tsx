@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import DiaryCard from '@/components/diary/diary-card';
 import RecordsHeader from '@/components/layout/records-header';
 import { Button } from '@/components/ui/button';
-import { Plus, Star } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -69,16 +69,14 @@ export default function RecordsPage() {
                       >
                         <div 
                            className={cn(
-                             "w-20 h-20 text-xs rounded-full shadow-md border-b-4 flex flex-col items-center justify-center gap-1",
+                             "w-20 h-20 text-xs rounded-full shadow-md border-b-4 flex flex-col items-center justify-center",
                              isSelected 
                                ? "bg-primary text-primary-foreground border-blue-800" 
                                : "bg-secondary text-secondary-foreground border-gray-300 dark:border-gray-600"
                            )}
                         >
-                          <Star className="w-3 h-3" />
                           <span className="font-bold">{format(date, 'M월', { locale: ko })}</span>
-                          <span className="text-xl font-bold font-headline">{format(date, 'd', { locale: ko })}</span>
-                          <Star className="w-3 h-3" />
+                          <span className="text-2xl font-bold font-headline">{format(date, 'd', { locale: ko })}</span>
                         </div>
                       </button>
                     );
