@@ -24,7 +24,6 @@ type NewEntryDialogProps = {
 export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: NewEntryDialogProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [locationDescription, setLocationDescription] = useState('');
   const [text, setText] = useState('');
   const [prompts, setPrompts] = useState<string[]>([]);
   const [distance, setDistance] = useState('');
@@ -56,7 +55,6 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
   const resetState = () => {
     setImagePreview(null);
     setImageFile(null);
-    setLocationDescription('');
     setText('');
     setPrompts([]);
     setDistance('');
@@ -70,7 +68,6 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
     if (isOpen) {
       if (entry) {
         setImagePreview(entry.photoUrl);
-        setLocationDescription(entry.location.description);
         setText(entry.text);
         setDistance(entry.stats?.distance?.toString() ?? '');
         setSteps(entry.stats?.steps?.toString() ?? '');
@@ -120,7 +117,7 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
             photoDataUri = imagePreview as string;
         }
 
-        const result = await suggestWritingPrompts({ photoDataUri, locationDescription: locationDescription || '어느 멋진 곳' });
+        const result = await suggestWritingPrompts({ photoDataUri, locationDescription: '어느 멋진 곳' });
         setPrompts(result.prompts);
     } catch (error) {
         toast({
@@ -138,7 +135,7 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
       photoUrl: imagePreview || '',
       imageHint: imageFile ? 'user uploaded' : entry?.imageHint || 'edited image',
       location: {
-        description: locationDescription,
+        description: '',
       },
       text: text,
       stats: {
@@ -149,7 +146,6 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
         endTime: endTime || undefined,
       }
     }, entry?.id);
-    onOpenChange(false);
   };
 
   const handleClose = (open: boolean) => {
@@ -219,15 +215,7 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
             
             <div className="flex flex-col gap-4 h-full">
                 <div className="flex-grow flex flex-col">
-                  <div className="mb-4">
-                      <Label htmlFor="location-description" className="text-sm font-medium text-foreground mb-2">어디를 산책했나요?</Label>
-                      <Input
-                          id="location-description"
-                          placeholder="예: 서울숲, 집 앞 공원"
-                          value={locationDescription}
-                          onChange={(e) => setLocationDescription(e.target.value)}
-                      />
-                  </div>
+                  
                   <label htmlFor="diary-text" className="flex items-center gap-2 text-sm font-medium text-foreground mb-2"><BookText className="w-4 h-4"/>오늘의 산책은 어땠나요?</label>
                   <Textarea
                       id="diary-text"

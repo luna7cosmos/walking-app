@@ -5,30 +5,47 @@ import type { DiaryEntry } from '@/app/lib/types';
 import Header from '@/components/layout/header';
 import DiaryGallery from '@/components/diary/diary-gallery';
 import NewEntryDialog from '@/components/diary/new-entry-dialog';
+import ActionSelectionDialog from '@/components/diary/action-selection-dialog';
 import { initialDiaryEntries } from '@/app/lib/mock-data';
 
 export default function Home() {
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingEntry, setEditingEntry] = useState<DiaryEntry | null>(null);
+  const [isNewEntryDialogOpen, setIsNewEntryDialogOpen] = useState(false);
+  const [isActionDialogOpen, setIsActionDialogOpen] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState<DiaryEntry | null>(null);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    // Sort entries by date descending to show newest first
     const sortedEntries = [...initialDiaryEntries].sort((a, b) => b.date.getTime() - a.date.getTime());
     setEntries(sortedEntries);
   }, []);
 
-  const handleOpenDialog = (entry: DiaryEntry | null = null) => {
-    setEditingEntry(entry);
-    setIsDialogOpen(true);
+  const handleOpenNewEntryDialog = (entry: DiaryEntry | null = null) => {
+    setSelectedEntry(entry);
+    setIsNewEntryDialogOpen(true);
+  };
+  
+  const handleEntryClick = (entry: DiaryEntry) => {
+    setSelectedEntry(entry);
+    setIsActionDialogOpen(true);
   };
 
-  const handleCloseDialog = () => {
-    setEditingEntry(null);
-    setIsDialogOpen(false);
+  const handleDelete = () => {
+    if (selectedEntry) {
+      setEntries(prevEntries => prevEntries.filter(entry => entry.id !== selectedEntry.id));
+    }
+    setIsActionDialogOpen(false);
+    setSelectedEntry(null);
   };
+
+  const handleEdit = () => {
+    setIsActionDialogOpen(false);
+    if(selectedEntry){
+        handleOpenNewEntryDialog(selectedEntry);
+    }
+  };
+
 
   const saveEntry = (entryData: Omit<DiaryEntry, 'id' | 'date'>, id?: string) => {
     if (id) {
@@ -47,7 +64,8 @@ export default function Home() {
       };
       setEntries(prevEntries => [newEntry, ...prevEntries]);
     }
-    handleCloseDialog();
+    setIsNewEntryDialogOpen(false);
+    setSelectedEntry(null);
   };
   
   if (!isClient) {
@@ -56,15 +74,26 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background font-body">
-      <Header onNewEntry={() => handleOpenDialog()} />
+      <Header onNewEntry={() => handleOpenNewEntryDialog()} />
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <DiaryGallery entries={entries} onEntryClick={handleOpenDialog} />
+        <DiaryGallery entries={entries} onEntryClick={handleEntryClick} />
       </main>
       <NewEntryDialog
-        isOpen={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        isOpen={isNewEntryDialogOpen}
+        onOpenChange={(isOpen) => {
+            if (!isOpen) {
+                setSelectedEntry(null);
+            }
+            setIsNewEntryDialogOpen(isOpen)
+        }}
         onSave={saveEntry}
-        entry={editingEntry}
+        entry={selectedEntry}
+      />
+      <ActionSelectionDialog
+        isOpen={isActionDialogOpen}
+        onOpenChange={setIsActionDialogOpen}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
     </div>
   );
