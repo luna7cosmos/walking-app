@@ -60,7 +60,7 @@ export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepP
   return (
     <div className="w-full max-w-4xl text-center animate-fade-in-up p-4">
       <h1 className="text-4xl font-headline font-bold text-primary mb-4">5단계: 산책일기 쓰기</h1>
-      <p className="text-lg text-muted-foreground mb-8">오늘의 산책은 어땠나요? 이제 감상을 기록해주세요.</p>
+      <p className="text-lg text-muted-foreground mb-8">거의 다 왔어요! 오늘의 산책은 어땠나요? 이제 감상을 기록해주세요.</p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start text-left">
         <div className="flex flex-col gap-4">

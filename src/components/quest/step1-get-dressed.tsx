@@ -11,7 +11,7 @@ export default function Step1GetDressed({ onNext, onShowGallery }: StepProps) {
   return (
     <div className="text-center animate-fade-in-up">
       <h1 className="text-4xl font-headline font-bold text-primary mb-4">1단계: 옷 입기</h1>
-      <p className="text-lg text-muted-foreground mb-8">산책할 준비를 해볼까요? 편안한 옷을 입어보세요!</p>
+      <p className="text-lg text-muted-foreground mb-8">산책할 준비를 해볼까요? 편안한 옷을 입는 것부터가 시작이에요. 아주 잘하고 있어요!</p>
       <Button onClick={onNext} size="lg" className="shadow-lg">준비 완료!</Button>
       <Button variant="link" onClick={onShowGallery} className="mt-8">
         갤러리 보기

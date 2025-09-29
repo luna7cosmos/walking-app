@@ -58,7 +58,7 @@ export default function Step4TakePhoto({ onPhotoTaken, onSkip }: StepProps) {
   return (
     <div className="w-full max-w-md text-center animate-fade-in-up">
       <h1 className="text-4xl font-headline font-bold text-primary mb-4">4단계: 산책 사진 선택</h1>
-      <p className="text-lg text-muted-foreground mb-8">갤러리에서 이번 산책을 가장 잘 나타내는 사진을 선택해주세요.</p>
+      <p className="text-lg text-muted-foreground mb-8">벌써 산책을 즐기고 계시는군요! 이번 산책을 가장 잘 나타내는 사진을 선택해주세요.</p>
       
       <div className="aspect-video w-full rounded-lg border-2 border-dashed border-muted-foreground/50 flex flex-col items-center justify-center text-muted-foreground bg-muted/20 p-4 mb-8">
         {imagePreview ? (
