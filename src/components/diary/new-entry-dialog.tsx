@@ -134,17 +134,8 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
   };
 
   const handleSave = () => {
-    if (!imagePreview || !text || !locationDescription) {
-      toast({
-        title: '필수 항목 누락',
-        description: '장소, 사진, 일기 내용은 필수입니다.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
     onSave({
-      photoUrl: imagePreview,
+      photoUrl: imagePreview || '',
       imageHint: imageFile ? 'user uploaded' : entry?.imageHint || 'edited image',
       location: {
         description: locationDescription,
