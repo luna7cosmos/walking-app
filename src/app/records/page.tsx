@@ -16,16 +16,16 @@ import { Badge } from '@/components/ui/badge';
 
 const badgeColors = [
   'bg-chart-1',
-  'bg-chart-2',
-  'bg-chart-3',
-  'bg-chart-4',
-  'bg-chart-5',
+  'bg-chart-1',
+  'bg-chart-1',
+  'bg-chart-1',
+  'bg-chart-1',
 ];
 
 const badgeTextColors = [
-  'text-white',
-  'text-white',
-  'text-white',
+  'text-chart-3',
+  'text-chart-3',
+  'text-chart-3',
   'text-chart-3',
   'text-chart-3',
 ];
@@ -73,8 +73,8 @@ export default function RecordsPage() {
                 <div className="flex flex-wrap gap-4 justify-center">
                   {recordedDates.map((date, index) => {
                     const isSelected = selectedDate?.getTime() === date.getTime();
-                    const colorClass = badgeColors[index % badgeColors.length];
-                    const textColorClass = badgeTextColors[index % badgeTextColors.length];
+                    const colorClass = badgeColors[0];
+                    const textColorClass = badgeTextColors[0];
                     return (
                       <button
                         key={date.toISOString()}
@@ -90,8 +90,8 @@ export default function RecordsPage() {
                              colorClass,
                              textColorClass,
                              isSelected 
-                               ? "border-primary-foreground/50" 
-                               : "border-transparent"
+                               ? "border-amber-700" 
+                               : "border-amber-500/50"
                            )}
                         >
                           <span className="font-bold text-lg">{format(date, 'M월', { locale: ko })}</span>
