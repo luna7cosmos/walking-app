@@ -12,6 +12,8 @@ import { Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+
 
 export default function RecordsPage() {
   const [entries] = useState<DiaryEntry[]>(initialDiaryEntries);
@@ -49,23 +51,25 @@ export default function RecordsPage() {
           <div className="md:col-span-1">
             <Card>
               <CardHeader>
-                <CardTitle>기록된 날짜</CardTitle>
-                <CardDescription>날짜를 선택해 일기를 보세요.</CardDescription>
+                <CardTitle>나의 산책 배지</CardTitle>
+                <CardDescription>배지를 선택해 그날의 일기를 보세요.</CardDescription>
               </CardHeader>
-              <CardContent className="p-2 pt-0 max-h-[60vh] overflow-y-auto">
-                <div className="flex flex-col gap-1">
+              <CardContent className="p-4 pt-0 max-h-[60vh] overflow-y-auto">
+                <div className="flex flex-wrap gap-2">
                   {recordedDates.map(date => (
                     <button
                       key={date.toISOString()}
                       onClick={() => setSelectedDate(date)}
                       className={cn(
-                        "w-full text-left p-2 rounded-md transition-colors",
-                        selectedDate?.getTime() === date.getTime()
-                          ? "bg-primary text-primary-foreground"
-                          : "hover:bg-muted"
+                        "transition-transform transform hover:scale-105"
                       )}
                     >
-                      {format(date, 'yyyy년 M월 d일 (eee)', { locale: ko })}
+                      <Badge 
+                        variant={selectedDate?.getTime() === date.getTime() ? "default" : "secondary"}
+                        className="text-sm py-2 px-4 shadow"
+                      >
+                        {format(date, 'M월 d일', { locale: ko })}
+                      </Badge>
                     </button>
                   ))}
                 </div>
@@ -96,3 +100,4 @@ export default function RecordsPage() {
       </main>
     </div>
   );
+}
