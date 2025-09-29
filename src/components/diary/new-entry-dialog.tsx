@@ -53,22 +53,23 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
     setIsLocating(false);
     setIsGeneratingPrompts(false);
     setLocationError(null);
-    onOpenChange(false);
   };
   
   useEffect(() => {
-    if (isOpen && entry) {
-      setImagePreview(entry.photoUrl);
-      setLocation(entry.location);
-      setText(entry.text);
-      setDistance(entry.stats?.distance ? (entry.stats.distance * 1000).toString() : '');
-      setTime(entry.stats?.time?.toString() ?? '');
-      setSteps(entry.stats?.steps?.toString() ?? '');
-      setImageFile(null);
-      setPrompts([]);
-      setLocationError(null);
-    } else {
-      resetState();
+    if (isOpen) {
+      if (entry) {
+        setImagePreview(entry.photoUrl);
+        setLocation(entry.location);
+        setText(entry.text);
+        setDistance(entry.stats?.distance ? (entry.stats.distance * 1000).toString() : '');
+        setTime(entry.stats?.time?.toString() ?? '');
+        setSteps(entry.stats?.steps?.toString() ?? '');
+        setImageFile(null);
+        setPrompts([]);
+        setLocationError(null);
+      } else {
+        resetState();
+      }
     }
   }, [isOpen, entry]);
 
@@ -172,15 +173,18 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
         steps: steps ? parseInt(steps, 10) : undefined,
       }
     }, entry?.id);
-    
-    // resetState is called by onOpenChange(false)
+    onOpenChange(false);
   };
 
+  const handleClose = (open: boolean) => {
+    if (!open) {
+      resetState();
+    }
+    onOpenChange(open);
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-        if(!open) resetState();
-        else onOpenChange(true);
-    }}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg md:max-w-2xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="font-headline text-primary text-2xl">{entry ? '산책 일기 수정' : '새로운 산책 일기'}</DialogTitle>
@@ -203,7 +207,7 @@ export default function NewEntryDialog({ isOpen, onOpenChange, onSave, entry }: 
                 </button>
               )}
                <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
-               {entry && <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>사진 변경</Button>}
+               {imagePreview && <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>사진 변경</Button>}
 
               <Button onClick={handleLocation} disabled={isLocating} variant="outline">
                 {isLocating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <MapPin className="mr-2 h-4 w-4" />}
