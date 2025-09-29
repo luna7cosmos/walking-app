@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import DiaryCard from '@/components/diary/diary-card';
 import RecordsHeader from '@/components/layout/records-header';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -16,18 +16,18 @@ import { Badge } from '@/components/ui/badge';
 
 const badgeColors = [
   'bg-chart-1',
-  'bg-chart-1',
-  'bg-chart-1',
-  'bg-chart-1',
-  'bg-chart-1',
+  'bg-chart-2',
+  'bg-chart-3',
+  'bg-chart-4',
+  'bg-chart-5',
 ];
 
 const badgeTextColors = [
-  'text-chart-3',
-  'text-chart-3',
-  'text-chart-3',
-  'text-chart-3',
-  'text-chart-3',
+  'text-chart-1-foreground',
+  'text-chart-2-foreground',
+  'text-chart-3-foreground',
+  'text-chart-4-foreground',
+  'text-chart-5-foreground',
 ];
 
 export default function RecordsPage() {
@@ -73,8 +73,8 @@ export default function RecordsPage() {
                 <div className="flex flex-wrap gap-4 justify-center">
                   {recordedDates.map((date, index) => {
                     const isSelected = selectedDate?.getTime() === date.getTime();
-                    const colorClass = badgeColors[0];
-                    const textColorClass = badgeTextColors[0];
+                    const colorClass = badgeColors[index % badgeColors.length];
+                    const textColorClass = 'text-white';
                     return (
                       <button
                         key={date.toISOString()}
@@ -90,8 +90,8 @@ export default function RecordsPage() {
                              colorClass,
                              textColorClass,
                              isSelected 
-                               ? "border-amber-700" 
-                               : "border-amber-500/50"
+                               ? "border-slate-700" 
+                               : "border-slate-500/50"
                            )}
                         >
                           <span className="font-bold text-lg">{format(date, 'M월', { locale: ko })}</span>
