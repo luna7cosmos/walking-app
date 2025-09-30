@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import type { DiaryEntry } from '@/app/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { MapPin, Route, Timer, Footprints, Clock } from 'lucide-react';
+import { MapPin, Route, Timer, Footprints, Clock, ImageOff } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 type DiaryCardProps = {
@@ -21,14 +21,21 @@ export default function DiaryCard({ entry, index }: DiaryCardProps) {
     >
       <CardHeader className="p-0">
         <div className="relative aspect-video w-full">
-          <Image
-            src={entry.photoUrl}
-            alt={entry.location.description}
-            fill
-            className="object-cover"
-            data-ai-hint={entry.imageHint}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          />
+          {entry.photoUrl ? (
+            <Image
+              src={entry.photoUrl}
+              alt={entry.location.description}
+              fill
+              className="object-cover"
+              data-ai-hint={entry.imageHint}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+          ) : (
+            <div className="w-full h-full bg-muted flex flex-col items-center justify-center text-muted-foreground">
+              <ImageOff className="w-10 h-10" />
+              <span className="mt-2 text-sm">사진 없음</span>
+            </div>
+          )}
         </div>
       </CardHeader>
       <CardContent className="p-4">
