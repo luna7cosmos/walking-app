@@ -24,7 +24,7 @@ export default function Step2MusicData({ onNext }: StepProps) {
 
   return (
     <div className="text-center animate-fade-in-up">
-      <h1 className="text-4xl font-headline font-bold text-primary mb-4">2단계: 이어폰과 데이터 켜기</h1>
+      <h1 className="text-4xl font-headline font-bold text-primary mb-4">3단계: 이어폰과 데이터 켜기</h1>
       <p className="text-2xl italic text-foreground/90 font-semibold mb-8 max-w-lg mx-auto">
         {quote || '산책길의 BGM을 준비하고, 세상과 연결될 준비를 하세요.'}
       </p>

@@ -35,7 +35,7 @@ export default function Step7WriteDiary({ onSave }: StepProps) {
 
   return (
     <div className="w-full max-w-4xl text-center animate-fade-in-up p-4">
-      <h1 className="text-4xl font-headline font-bold text-primary mb-4">5단계: 산책일기 쓰기</h1>
+      <h1 className="text-4xl font-headline font-bold text-primary mb-4">6단계: 산책일기 쓰기</h1>
       <p className="text-2xl italic text-foreground/90 font-semibold mb-8 max-w-2xl mx-auto">
         {quote || '거의 다 왔어요! 오늘의 산책은 어땠나요? 이제 감상을 기록해주세요.'}
       </p>

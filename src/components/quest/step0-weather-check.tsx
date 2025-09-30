@@ -25,7 +25,7 @@ export default function Step0WeatherCheck({ onNext, onShowGallery }: StepProps) 
 
   return (
     <div className="text-center animate-fade-in-up">
-      <h1 className="text-4xl font-headline font-bold text-primary mb-4">0단계: 날씨와 온도 확인하기</h1>
+      <h1 className="text-4xl font-headline font-bold text-primary mb-4">1단계: 날씨와 온도 확인하기</h1>
       <p className="text-2xl italic text-foreground/90 font-semibold mb-8 max-w-lg">
         {quote || '산책 나가기 전, 잠시 창밖을 보거나 앱으로 날씨를 확인해 보세요. 옷차림을 결정하는 데 도움이 될 거예요.'}
       </p>

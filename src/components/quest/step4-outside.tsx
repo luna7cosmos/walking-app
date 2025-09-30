@@ -24,7 +24,7 @@ export default function Step4Outside({ onNext }: StepProps) {
 
   return (
     <div className="text-center animate-fade-in-up">
-      <h1 className="text-4xl font-headline font-bold text-primary mb-4">4단계: 집 밖으로!</h1>
+      <h1 className="text-4xl font-headline font-bold text-primary mb-4">5단계: 집 밖으로!</h1>
       <p className="text-2xl italic text-foreground/90 font-semibold mb-8 max-w-lg">
         {quote || '문을 열고 밖으로 나오셨군요! 새로운 공기가 당신을 기다립니다. 정말 멋진 시작이에요!'}
       </p>
