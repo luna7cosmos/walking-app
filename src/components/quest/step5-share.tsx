@@ -28,7 +28,7 @@ export default function Step5Share({ onNext }: StepProps) {
       <h1 className="flex items-center justify-center gap-3 text-4xl font-headline font-bold text-primary mb-4">
         퀘스트 완료!
       </h1>
-      <p className="text-xl italic text-foreground/90 font-semibold mb-12">
+      <p className="text-2xl italic text-foreground/90 font-semibold mb-12">
         {quote || '축하합니다! 오늘의 산책 퀘스트를 모두 완수하셨습니다.'}
       </p>
 
