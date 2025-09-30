@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { BookCheck } from 'lucide-react';
-import Image from 'next/image';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 type StepProps = {
   onNext: () => void;
@@ -18,8 +16,6 @@ const quotes = [
   '참 잘했어요! 당신은 이미 충분히 빛나고 있어요.',
 ];
 
-const trophyImage = PlaceHolderImages.find(p => p.id === 'quest-complete-trophy');
-
 export default function Step5Share({ onNext }: StepProps) {
   const [quote, setQuote] = useState('');
 
@@ -29,18 +25,6 @@ export default function Step5Share({ onNext }: StepProps) {
 
   return (
     <div className="w-full max-w-md text-center animate-fade-in-up">
-      <div className="flex justify-center mb-8">
-        {trophyImage && (
-          <Image 
-            src={trophyImage.imageUrl} 
-            alt="참 잘했어요" 
-            width={128} 
-            height={128}
-            className="w-32 h-32"
-            data-ai-hint={trophyImage.imageHint}
-          />
-        )}
-      </div>
       <h1 className="flex items-center justify-center gap-3 text-4xl font-headline font-bold text-primary mb-4">
         퀘스트 완료!
       </h1>
