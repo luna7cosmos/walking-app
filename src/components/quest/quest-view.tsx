@@ -5,10 +5,11 @@ import type { DiaryEntry } from '@/app/lib/types';
 
 import Step0 from './step0-weather-check';
 import Step1 from './step1-get-dressed';
-import Step2 from './step2-at-door';
-import Step3 from './step3-outside';
-import Step5 from './step5-share';
-import Step6 from './step6-write-diary';
+import Step2 from './step2-music-data';
+import Step3 from './step3-at-door';
+import Step4 from './step4-outside';
+import Step6 from './step7-write-diary';
+import Step7 from './step8-share';
 
 type QuestViewProps = {
   onQuestComplete: (newEntry: Omit<DiaryEntry, 'id' | 'date'>) => void;
@@ -43,9 +44,11 @@ export default function QuestView({ onQuestComplete, onShowGallery }: QuestViewP
       case 3:
         return <Step3 onNext={nextStep} />;
       case 4:
-        return <Step6 onSave={handleDiarySave} />;
+        return <Step4 onNext={nextStep} />;
       case 5:
-        return <Step5 onNext={handleQuestFinished} />;
+        return <Step6 onSave={handleDiarySave} />;
+      case 6:
+        return <Step7 onNext={handleQuestFinished} />;
       default:
         return null;
     }
