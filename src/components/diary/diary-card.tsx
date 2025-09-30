@@ -1,9 +1,7 @@
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import type { DiaryEntry } from '@/app/lib/types';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { MapPin, Route, Timer, Footprints, Clock } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 
 type DiaryCardProps = {
   entry: DiaryEntry;
@@ -11,55 +9,15 @@ type DiaryCardProps = {
 };
 
 export default function DiaryCard({ entry, index }: DiaryCardProps) {
-  const hasStats = entry.stats && (entry.stats.distance != null || entry.stats.time != null || entry.stats.steps != null || (entry.stats.startTime && entry.stats.endTime));
 
   return (
     <Card 
-      className="overflow-hidden transition-transform transform hover:scale-[1.02] hover:shadow-xl duration-300 ease-in-out opacity-0 animate-fade-in-up flex flex-col h-full"
+      className="overflow-hidden transition-transform transform hover:scale-[1.02] hover:shadow-xl duration-300 ease-in-out opacity-0 animate-fade-in-up flex flex-col h-full justify-center items-center"
       style={{ animationDelay: `${index * 100}ms` }}
     >
       <CardHeader>
         <CardTitle className="font-headline text-xl mb-2">{format(entry.date, 'yyyy년 M월 d일', { locale: ko })}</CardTitle>
-        <CardDescription className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <MapPin className="w-4 h-4" />
-          {entry.location.description}
-        </CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col flex-grow">
-        <p className="text-sm text-foreground/80 line-clamp-3 flex-grow">{entry.text}</p>
-        
-        {hasStats && (
-          <>
-            <Separator className="my-4" />
-            <div className="flex flex-wrap justify-start gap-x-6 gap-y-2 items-center text-xs text-muted-foreground">
-              {entry.stats?.startTime && entry.stats?.endTime && (
-                 <div className="flex items-center gap-1.5" title="산책 시간">
-                   <Clock className="w-4 h-4" />
-                   <span>{entry.stats.startTime} - {entry.stats.endTime}</span>
-                 </div>
-              )}
-              {entry.stats?.time != null && (
-                <div className="flex items-center gap-1.5" title="총 시간">
-                  <Timer className="w-4 h-4" />
-                  <span>{entry.stats.time}분</span>
-                </div>
-              )}
-              {entry.stats?.distance != null && (
-                <div className="flex items-center gap-1.5" title="거리">
-                  <Route className="w-4 h-4" />
-                  <span>{entry.stats.distance.toLocaleString()}m</span>
-                </div>
-              )}
-              {entry.stats?.steps != null && (
-                <div className="flex items-center gap-1.5" title="걸음 수">
-                  <Footprints className="w-4 h-4" />
-                  <span>{entry.stats.steps.toLocaleString()}</span>
-                </div>
-              )}
-            </div>
-          </>
-        )}
-      </CardContent>
     </Card>
   );
 }

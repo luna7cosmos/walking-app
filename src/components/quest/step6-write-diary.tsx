@@ -1,13 +1,9 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import type { DiaryEntry } from '@/app/lib/types';
-import { BookText, Save, BarChart, Route, Timer, Footprints, Clock, MapPin } from 'lucide-react';
-import { z } from 'zod';
+import { Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 type StepProps = {
@@ -22,28 +18,8 @@ const quotes = [
   '당신의 이야기를 들려주세요. 세상이 당신의 목소리를 기다리고 있습니다.',
 ];
 
-const diaryEntrySchema = z.object({
-  location: z.object({
-    description: z.string().max(100),
-  }),
-  text: z.string().max(5000),
-  stats: z.object({
-    distance: z.number().int().positive().optional(),
-    time: z.number().int().positive().optional(),
-    steps: z.number().int().positive().optional(),
-    startTime: z.string().optional(),
-    endTime: z.string().optional(),
-  }),
-});
-
 
 export default function Step6WriteDiary({ onSave }: StepProps) {
-  const [text, setText] = useState('');
-  const [location, setLocation] = useState('');
-  const [distance, setDistance] = useState('');
-  const [steps, setSteps] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
   const [quote, setQuote] = useState('');
   const { toast } = useToast();
 
@@ -51,50 +27,10 @@ export default function Step6WriteDiary({ onSave }: StepProps) {
     setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
   }, []);
   
-  const duration = useMemo(() => {
-    if (startTime && endTime) {
-      const [startH, startM] = startTime.split(':').map(Number);
-      const [endH, endM] = endTime.split(':').map(Number);
-      if (!isNaN(startH) && !isNaN(startM) && !isNaN(endH) && !isNaN(endM) && startH >= 0 && startH < 24 && startM >= 0 && startM < 60 && endH >= 0 && endH < 24 && endM >= 0 && endM < 60) {
-        const startTotalMinutes = startH * 60 + startM;
-        let endTotalMinutes = endH * 60 + endM;
-        if (endTotalMinutes < startTotalMinutes) {
-          // Handle overnight case
-          endTotalMinutes += 24 * 60;
-        }
-        return endTotalMinutes - startTotalMinutes;
-      }
-    }
-    return null;
-  }, [startTime, endTime]);
 
   const handleSave = () => {
-    const calculatedDuration = duration;
-    const entryData = {
-      location: { description: location || '나의 산책길' },
-      text: text,
-      stats: {
-        distance: distance ? parseInt(distance, 10) : undefined,
-        time: calculatedDuration !== null ? calculatedDuration : undefined,
-        steps: steps ? parseInt(steps, 10) : undefined,
-        startTime: startTime || undefined,
-        endTime: endTime || undefined,
-      }
-    };
-
-    const validation = diaryEntrySchema.safeParse(entryData);
-
-    if (!validation.success) {
-      console.error(validation.error);
-      toast({
-        title: '입력 오류',
-        description: '입력 내용을 다시 확인해주세요.',
-        variant: 'destructive'
-      });
-      return;
-    }
-    
-    onSave(validation.data);
+    const entryData = {};
+    onSave(entryData);
   };
 
   return (
@@ -103,62 +39,6 @@ export default function Step6WriteDiary({ onSave }: StepProps) {
       <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
         {quote || '거의 다 왔어요! 오늘의 산책은 어땠나요? 이제 감상을 기록해주세요.'}
       </p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start text-left">
-        <div className="flex flex-col gap-4">
-             <div className="space-y-3 pt-2">
-                <Label className="flex items-center gap-2 text-sm font-medium"><BarChart className="w-4 h-4 text-muted-foreground"/>산책 기록 (선택)</Label>
-                
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="relative">
-                      <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input id="start-time" type="time" placeholder="시작 (HH:mm)" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="pl-8" />
-                    </div>
-                    <div className="relative">
-                       <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                       <Input id="end-time" type="time" placeholder="종료 (HH:mm)" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="pl-8" />
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="relative">
-                    <Route className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="distance" type="number" placeholder="거리 (m)" value={distance} onChange={(e) => setDistance(e.target.value)} className="pl-8" />
-                  </div>
-                   <div className="relative">
-                    <Timer className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="time" type="number" placeholder="총 시간(분)" value={duration !== null ? duration : ''} readOnly className="pl-8 bg-muted/50" />
-                  </div>
-                  <div className="relative">
-                    <Footprints className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="steps" type="number" placeholder="걸음 수" value={steps} onChange={(e) => setSteps(e.target.value)} className="pl-8" />
-                  </div>
-                </div>
-              </div>
-        </div>
-        
-        <div className="flex flex-col gap-4 h-full">
-            <div>
-                 <label htmlFor="location-text" className="flex items-center gap-2 text-sm font-medium text-foreground mb-2"><MapPin className="w-4 h-4"/>어디를 산책했나요?</label>
-                  <Input
-                      id="location-text"
-                      placeholder="예: 서울숲, 집 앞 공원"
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                  />
-            </div>
-          <div className="flex-grow flex flex-col">
-            <label htmlFor="diary-text" className="flex items-center gap-2 text-sm font-medium text-foreground mb-2"><BookText className="w-4 h-4"/>오늘의 감상</label>
-            <Textarea
-                id="diary-text"
-                placeholder="이곳에 감상을 기록해보세요..."
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                className="flex-grow text-base resize-none min-h-[150px]"
-            />
-          </div>
-        </div>
-      </div>
       
       <Button onClick={handleSave} size="lg" className="mt-8 shadow-lg">
         <Save className="mr-2" />
