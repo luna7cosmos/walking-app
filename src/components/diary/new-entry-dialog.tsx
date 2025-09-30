@@ -1,9 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
-import Image from 'next/image';
-import { Camera, Loader2, Sparkles, BookText, BarChart, Route, Timer, Footprints, Clock, MapPin } from 'lucide-react';
-import { suggestWritingPrompts } from '@/ai/flows/suggest-writing-prompts';
+import { useState, useEffect, useMemo } from 'react';
+import { BookText, BarChart, Route, Timer, Footprints, Clock, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { DiaryEntry } from '@/app/lib/types';
 import { useDiary } from '@/contexts/DiaryContext';
@@ -24,8 +22,6 @@ type NewEntryDialogProps = {
 };
 
 const diaryEntrySchema = z.object({
-  photoUrl: z.string().url().or(z.literal('')),
-  imageHint: z.string(),
   location: z.object({
     description: z.string().max(100),
   }),
@@ -41,20 +37,14 @@ const diaryEntrySchema = z.object({
 
 
 export default function NewEntryDialog({ isOpen, onOpenChange, entry }: NewEntryDialogProps) {
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const [text, setText] = useState('');
   const [location, setLocation] = useState('');
-  const [prompts, setPrompts] = useState<string[]>([]);
   const [distance, setDistance] = useState('');
   const [steps, setSteps] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const { addEntry, updateEntry } = useDiary();
 
-  const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
   const duration = useMemo(() => {
@@ -75,90 +65,32 @@ export default function NewEntryDialog({ isOpen, onOpenChange, entry }: NewEntry
 
 
   const resetState = () => {
-    setImagePreview(null);
-    setImageFile(null);
     setText('');
     setLocation('');
-    setPrompts([]);
     setDistance('');
     setSteps('');
     setStartTime('');
     setEndTime('');
-    setIsGeneratingPrompts(false);
   };
   
   useEffect(() => {
     if (isOpen) {
       if (entry) {
-        setImagePreview(entry.photoUrl);
         setText(entry.text);
         setLocation(entry.location.description);
         setDistance(entry.stats?.distance?.toString() ?? '');
         setSteps(entry.stats?.steps?.toString() ?? '');
         setStartTime(entry.stats?.startTime ?? '');
         setEndTime(entry.stats?.endTime ?? '');
-        setImageFile(null);
-        setPrompts([]);
       } else {
         resetState();
       }
     }
   }, [isOpen, entry]);
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleGeneratePrompts = async () => {
-    const imageSource = imageFile || imagePreview;
-    if (!imageSource) {
-      toast({
-        title: '사진 필요',
-        description: 'AI 추천을 받으려면 먼저 사진을 올려주세요.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    setIsGeneratingPrompts(true);
-
-    try {
-        let photoDataUri: string;
-        if (imageFile) {
-            photoDataUri = await new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result as string);
-                reader.readAsDataURL(imageFile);
-            });
-        } else {
-            photoDataUri = imagePreview as string;
-        }
-
-        const result = await suggestWritingPrompts({ photoDataUri, locationDescription: location || '어느 멋진 곳' });
-        setPrompts(result.prompts);
-    } catch (error) {
-        toast({
-            title: 'AI 추천 생성 오류',
-            description: 'AI 추천을 생성하는 중 오류가 발생했습니다.',
-            variant: 'destructive',
-        });
-    } finally {
-        setIsGeneratingPrompts(false);
-    }
-  };
-
   const handleSave = () => {
     const calculatedDuration = duration;
     const entryData = {
-      photoUrl: imagePreview || '',
-      imageHint: imageFile ? 'user uploaded' : entry?.imageHint || 'edited image',
       location: {
         description: location || '나의 산책길',
       },
@@ -172,22 +104,10 @@ export default function NewEntryDialog({ isOpen, onOpenChange, entry }: NewEntry
       }
     };
 
-    const validation = diaryEntrySchema.safeParse(entryData);
-
-    if (!validation.success) {
-      console.error(validation.error);
-      toast({
-        title: '입력 오류',
-        description: '입력 내용을 다시 확인해주세요.',
-        variant: 'destructive'
-      });
-      return;
-    }
-
     if (entry && entry.id) {
-        updateEntry({ ...entry, ...validation.data, date: entry.date });
+        updateEntry({ ...entry, ...entryData, date: entry.date });
     } else {
-        addEntry(validation.data);
+        addEntry(entryData);
     }
 
     handleClose(false);
@@ -210,22 +130,6 @@ export default function NewEntryDialog({ isOpen, onOpenChange, entry }: NewEntry
         <div className="grid gap-6 py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
             <div className="flex flex-col gap-4">
-              {imagePreview ? (
-                <div className="relative aspect-video w-full rounded-lg overflow-hidden border shadow-sm">
-                  <Image src={imagePreview} alt="Uploaded preview" fill className="object-cover" />
-                </div>
-              ) : (
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="aspect-video w-full rounded-lg border-2 border-dashed border-muted-foreground/50 flex flex-col items-center justify-center text-muted-foreground hover:bg-muted transition-colors"
-                >
-                  <Camera className="h-10 w-10 mb-2" />
-                  <span className="font-semibold">사진 올리기</span>
-                </button>
-              )}
-               <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
-               {imagePreview && <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>사진 변경</Button>}
-
               <div className="space-y-3 pt-2">
                 <Label className="flex items-center gap-2 text-sm font-medium"><BarChart className="w-4 h-4 text-muted-foreground"/>산책 기록 (선택)</Label>
                 
@@ -278,22 +182,6 @@ export default function NewEntryDialog({ isOpen, onOpenChange, entry }: NewEntry
                       className="flex-grow text-base resize-none min-h-[150px]"
                   />
                 </div>
-              <Button onClick={handleGeneratePrompts} disabled={isGeneratingPrompts || !imagePreview} className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                {isGeneratingPrompts ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                AI 글쓰기 추천
-              </Button>
-              {prompts.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium">추천 프롬프트:</h4>
-                  <div className="flex flex-col gap-2">
-                    {prompts.map((p, i) => (
-                      <Button key={i} variant="outline" size="sm" className="text-left justify-start h-auto" onClick={() => setText(prev => `${prev}${prev ? '\n\n' : ''}${p}`)}>
-                        <p className="whitespace-normal">{p}</p>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>

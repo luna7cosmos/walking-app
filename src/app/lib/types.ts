@@ -1,7 +1,5 @@
 export interface DiaryEntry {
   id?: string;
-  photoUrl: string;
-  imageHint: string;
   date: Date;
   location: {
     description: string;

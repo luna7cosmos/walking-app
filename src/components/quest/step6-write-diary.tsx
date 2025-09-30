@@ -1,19 +1,16 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { DiaryEntry } from '@/app/lib/types';
-import { BookText, Sparkles, Save, BarChart, Route, Timer, Footprints, Clock, MapPin } from 'lucide-react';
+import { BookText, Save, BarChart, Route, Timer, Footprints, Clock, MapPin } from 'lucide-react';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 
 type StepProps = {
-  photoDataUri: string;
-  prompts: string[];
   onSave: (newEntry: Omit<DiaryEntry, 'id' | 'date'>) => void;
 };
 
@@ -26,8 +23,6 @@ const quotes = [
 ];
 
 const diaryEntrySchema = z.object({
-  photoUrl: z.string(),
-  imageHint: z.string(),
   location: z.object({
     description: z.string().max(100),
   }),
@@ -42,7 +37,7 @@ const diaryEntrySchema = z.object({
 });
 
 
-export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepProps) {
+export default function Step6WriteDiary({ onSave }: StepProps) {
   const [text, setText] = useState('');
   const [location, setLocation] = useState('');
   const [distance, setDistance] = useState('');
@@ -76,8 +71,6 @@ export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepP
   const handleSave = () => {
     const calculatedDuration = duration;
     const entryData = {
-      photoUrl: photoDataUri,
-      imageHint: 'user uploaded',
       location: { description: location || '나의 산책길' },
       text: text,
       stats: {
@@ -106,22 +99,13 @@ export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepP
 
   return (
     <div className="w-full max-w-4xl text-center animate-fade-in-up p-4">
-      <h1 className="text-4xl font-headline font-bold text-primary mb-4">5단계: 산책일기 쓰기</h1>
+      <h1 className="text-4xl font-headline font-bold text-primary mb-4">4단계: 산책일기 쓰기</h1>
       <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
         {quote || '거의 다 왔어요! 오늘의 산책은 어땠나요? 이제 감상을 기록해주세요.'}
       </p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start text-left">
         <div className="flex flex-col gap-4">
-            {photoDataUri ? (
-              <div className="relative aspect-video w-full rounded-lg overflow-hidden border shadow-sm">
-                <Image src={photoDataUri} alt="Captured from walk" fill className="object-cover" />
-              </div>
-            ) : (
-              <div className="relative aspect-video w-full rounded-lg bg-muted flex items-center justify-center">
-                <p className="text-muted-foreground">사진을 건너뛰었습니다.</p>
-              </div>
-            )}
              <div className="space-y-3 pt-2">
                 <Label className="flex items-center gap-2 text-sm font-medium"><BarChart className="w-4 h-4 text-muted-foreground"/>산책 기록 (선택)</Label>
                 
@@ -173,18 +157,6 @@ export default function Step6WriteDiary({ photoDataUri, prompts, onSave }: StepP
                 className="flex-grow text-base resize-none min-h-[150px]"
             />
           </div>
-          {prompts.length > 0 && (
-            <div className="space-y-2">
-              <h4 className="flex items-center gap-2 text-sm font-medium"><Sparkles className="w-4 h-4 text-accent"/> AI 글쓰기 추천</h4>
-              <div className="flex flex-col gap-2">
-                {prompts.map((p, i) => (
-                  <Button key={i} variant="outline" size="sm" className="text-left justify-start h-auto" onClick={() => setText(prev => `${prev}${prev ? '\n\n' : ''}${p}`)}>
-                    <p className="whitespace-normal">{p}</p>
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
       

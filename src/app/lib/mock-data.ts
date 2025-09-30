@@ -1,16 +1,8 @@
 import type { DiaryEntry } from './types';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-
-const walk1 = PlaceHolderImages.find(p => p.id === 'walk-1');
-const walk2 = PlaceHolderImages.find(p => p.id === 'walk-2');
-const walk3 = PlaceHolderImages.find(p => p.id === 'walk-3');
-const walk4 = PlaceHolderImages.find(p => p.id === 'walk-4');
 
 export const initialDiaryEntries: DiaryEntry[] = [
   {
     id: '1',
-    photoUrl: walk1?.imageUrl || '',
-    imageHint: walk1?.imageHint || 'park path',
     date: new Date('2024-05-20T10:30:00'),
     location: {
       description: '서울숲 공원',
@@ -20,8 +12,6 @@ export const initialDiaryEntries: DiaryEntry[] = [
   },
   {
     id: '2',
-    photoUrl: walk2?.imageUrl || '',
-    imageHint: walk2?.imageHint || 'flower macro',
     date: new Date('2024-05-18T15:00:00'),
     location: {
       description: '부산 시민공원',
@@ -30,8 +20,6 @@ export const initialDiaryEntries: DiaryEntry[] = [
   },
   {
     id: '3',
-    photoUrl: walk3?.imageUrl || '',
-    imageHint: walk3?.imageHint || 'city street',
     date: new Date('2024-05-15T19:00:00'),
     location: {
       description: '대학로 거리',
@@ -41,8 +29,6 @@ export const initialDiaryEntries: DiaryEntry[] = [
   },
   {
     id: '4',
-    photoUrl: walk4?.imageUrl || '',
-    imageHint: walk4?.imageHint || 'hill view',
     date: new Date('2024-05-12T08:00:00'),
     location: {
       description: '선유도 공원',

@@ -6,7 +6,6 @@ import type { DiaryEntry } from '@/app/lib/types';
 import Step1 from './step1-get-dressed';
 import Step2 from './step2-at-door';
 import Step3 from './step3-outside';
-import Step4 from './step4-take-photo';
 import Step5 from './step5-share';
 import Step6 from './step6-write-diary';
 
@@ -17,23 +16,9 @@ type QuestViewProps = {
 
 export default function QuestView({ onQuestComplete, onShowGallery }: QuestViewProps) {
   const [currentStep, setCurrentStep] = useState(1);
-  const [photoDataUri, setPhotoDataUri] = useState<string>('');
-  const [prompts, setPrompts] = useState<string[]>([]);
   const [newEntry, setNewEntry] = useState<Omit<DiaryEntry, 'id' | 'date'> | null>(null);
   
   const nextStep = () => setCurrentStep(prev => prev + 1);
-
-  const handlePhotoTaken = (uri: string, suggestedPrompts: string[]) => {
-    setPhotoDataUri(uri);
-    setPrompts(suggestedPrompts);
-    nextStep();
-  };
-
-  const handleSkipPhoto = () => {
-    setPhotoDataUri('');
-    setPrompts([]);
-    nextStep();
-  }
   
   const handleDiarySave = (entry: Omit<DiaryEntry, 'id' | 'date'>) => {
     setNewEntry(entry);
@@ -55,10 +40,8 @@ export default function QuestView({ onQuestComplete, onShowGallery }: QuestViewP
       case 3:
         return <Step3 onNext={nextStep} />;
       case 4:
-        return <Step4 onPhotoTaken={handlePhotoTaken} onSkip={handleSkipPhoto} />;
+        return <Step6 onSave={handleDiarySave} />;
       case 5:
-        return <Step6 photoDataUri={photoDataUri} prompts={prompts} onSave={handleDiarySave} />;
-      case 6:
         return <Step5 onNext={handleQuestFinished} />;
       default:
         return null;

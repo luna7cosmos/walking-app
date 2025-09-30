@@ -1,9 +1,8 @@
-import Image from 'next/image';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import type { DiaryEntry } from '@/app/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { MapPin, Route, Timer, Footprints, Clock, ImageOff } from 'lucide-react';
+import { MapPin, Route, Timer, Footprints, Clock } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 type DiaryCardProps = {
@@ -16,35 +15,18 @@ export default function DiaryCard({ entry, index }: DiaryCardProps) {
 
   return (
     <Card 
-      className="overflow-hidden transition-transform transform hover:scale-[1.02] hover:shadow-xl duration-300 ease-in-out opacity-0 animate-fade-in-up"
+      className="overflow-hidden transition-transform transform hover:scale-[1.02] hover:shadow-xl duration-300 ease-in-out opacity-0 animate-fade-in-up flex flex-col h-full"
       style={{ animationDelay: `${index * 100}ms` }}
     >
-      <CardHeader className="p-0">
-        <div className="relative aspect-video w-full">
-          {entry.photoUrl ? (
-            <Image
-              src={entry.photoUrl}
-              alt={entry.location.description}
-              fill
-              className="object-cover"
-              data-ai-hint={entry.imageHint}
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            />
-          ) : (
-            <div className="w-full h-full bg-muted flex flex-col items-center justify-center text-muted-foreground">
-              <ImageOff className="w-10 h-10" />
-              <span className="mt-2 text-sm">사진 없음</span>
-            </div>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="p-4">
+      <CardHeader>
         <CardTitle className="font-headline text-xl mb-2">{format(entry.date, 'yyyy년 M월 d일', { locale: ko })}</CardTitle>
-        <CardDescription className="flex items-center gap-1.5 text-sm text-muted-foreground mb-3">
+        <CardDescription className="flex items-center gap-1.5 text-sm text-muted-foreground">
           <MapPin className="w-4 h-4" />
           {entry.location.description}
         </CardDescription>
-        <p className="text-sm text-foreground/80 line-clamp-3">{entry.text}</p>
+      </CardHeader>
+      <CardContent className="flex flex-col flex-grow">
+        <p className="text-sm text-foreground/80 line-clamp-3 flex-grow">{entry.text}</p>
         
         {hasStats && (
           <>
