@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { DiaryEntry } from '@/app/lib/types';
 
+import Step0 from './step0-weather-check';
 import Step1 from './step1-get-dressed';
 import Step2 from './step2-at-door';
 import Step3 from './step3-outside';
@@ -15,7 +16,7 @@ type QuestViewProps = {
 };
 
 export default function QuestView({ onQuestComplete, onShowGallery }: QuestViewProps) {
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0);
   const [newEntry, setNewEntry] = useState<Omit<DiaryEntry, 'id' | 'date'> | null>(null);
   
   const nextStep = () => setCurrentStep(prev => prev + 1);
@@ -33,6 +34,8 @@ export default function QuestView({ onQuestComplete, onShowGallery }: QuestViewP
 
   const renderStep = () => {
     switch (currentStep) {
+      case 0:
+        return <Step0 onNext={nextStep} onShowGallery={onShowGallery}/>;
       case 1:
         return <Step1 onNext={nextStep} onShowGallery={onShowGallery} />;
       case 2:
