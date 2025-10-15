@@ -14,7 +14,7 @@
 /coverage
 
 # next.js
-/.next/
+/.next/git checkout -b gh-pages
 /out/
 
 # production

@@ -29,6 +29,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   /* config options here */
+  output: 'export',
+  basePath: '/walking-app',
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -36,6 +38,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
